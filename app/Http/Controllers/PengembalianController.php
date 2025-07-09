@@ -273,8 +273,7 @@ class PengembalianController extends Controller
     public function uploadPenaltyPayment(Request $request, $id)
     {
         $request->validate([
-            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB max
-            'catatan_pembayaran' => 'nullable|string|max:1000'
+            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:5120' // 5MB max
         ]);
 
         $user = auth()->guard('user')->user();
@@ -291,22 +290,25 @@ class PengembalianController extends Controller
             $imageData = file_get_contents($request->file('bukti_pembayaran')->getRealPath());
             $base64Image = base64_encode($imageData);
 
-            // Create transaction record for penalty payment
-            $transaksi = \App\Models\Transaksi::create([
+            // Update pengembalian with payment proof and status
+            $pengembalian->update([
+                'bukti_pembayaran_denda' => $base64Image,
+                'tanggal_upload_pembayaran' => now(),
+                'status_pengembalian' => 'payment_uploaded',
+                'status_pembayaran_denda' => 'uploaded'
+            ]);
+
+            // Also create transaction record for tracking
+            \App\Models\Transaksi::create([
                 'id_user' => $user->id_user,
-                'id_peminjaman' => null, // This is for penalty, not sewa
+                'id_peminjaman' => null,
                 'id_pengembalian' => $pengembalian->id_pengembalian,
                 'jenis_transaksi' => 'denda',
                 'nominal' => $pengembalian->total_denda,
                 'bukti_pembayaran' => $base64Image,
                 'status_verifikasi' => 'pending',
                 'tanggal_pembayaran' => now(),
-                'notes_admin' => $request->catatan_pembayaran
-            ]);
-
-            // Update pengembalian status
-            $pengembalian->update([
-                'status_pengembalian' => 'payment_uploaded'
+                'notes_admin' => null
             ]);
 
             DB::commit();

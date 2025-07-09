@@ -17,11 +17,19 @@ class Pengembalian extends Model
         'denda_telat',
         'hari_telat',
         'notes_admin',
-        'verified_by'
+        'verified_by',
+        'bukti_pembayaran_denda',
+        'tanggal_upload_pembayaran',
+        'status_pembayaran_denda',
+        'catatan_pembayaran',
+        'verified_payment_by',
+        'verified_payment_at'
     ];
 
     protected $casts = [
         'tanggal_pengembalian_aktual' => 'datetime',
+        'tanggal_upload_pembayaran' => 'datetime',
+        'verified_payment_at' => 'datetime',
         'total_denda' => 'decimal:2',
         'denda_telat' => 'decimal:2',
         'hari_telat' => 'integer',
@@ -36,6 +44,12 @@ class Pengembalian extends Model
     }
 
     public function verifiedBy()
+    {
+        return $this->belongsTo(Admin::class, 'verified_by');
+    }
+    
+    // Alias untuk processedBy (sama dengan verifiedBy)
+    public function processedBy()
     {
         return $this->belongsTo(Admin::class, 'verified_by');
     }

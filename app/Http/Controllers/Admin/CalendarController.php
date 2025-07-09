@@ -204,7 +204,7 @@ class CalendarController extends Controller
                 'tanggal_mulai' => Carbon::parse($peminjaman->tanggal_mulai)->format('d/m/Y'),
                 'tanggal_selesai' => Carbon::parse($peminjaman->tanggal_selesai)->format('d/m/Y'),
                 'durasi_hari' => Carbon::parse($peminjaman->tanggal_mulai)->diffInDays(Carbon::parse($peminjaman->tanggal_selesai)) + 1,
-                'nama_admin' => $admin->nama_admin ?? 'Admin',
+                'nama_admin' => $admin->nama_lengkap ?? 'Admin',
                 'is_ongoing' => $isOngoing
             ]
         ];

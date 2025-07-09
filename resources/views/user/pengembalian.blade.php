@@ -36,8 +36,8 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">{{ $returnHistory->where('status_pengembalian', 'pending')->count() }}</h3>
-                    <p class="text-sm text-gray-600">Menunggu Proses</p>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ $returnHistory->whereIn('status_pengembalian', ['pending', 'payment_required', 'payment_uploaded'])->count() }}</h3>
+                    <p class="text-sm text-gray-600">Dalam Proses</p>
                 </div>
             </div>
         </div>
@@ -57,17 +57,17 @@
             </div>
         </div>
 
-        <!-- Completed Returns -->
+        <!-- Payment Required -->
         <div class="bg-white rounded-lg shadow-sm p-6">
             <div class="flex items-center">
-                <div class="p-3 rounded-full bg-green-100">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <div class="p-3 rounded-full bg-orange-100">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">{{ $returnHistory->where('status_pengembalian', 'completed')->count() }}</h3>
-                    <p class="text-sm text-gray-600">Selesai</p>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ $returnHistory->whereIn('status_pengembalian', ['payment_required', 'payment_uploaded'])->count() }}</h3>
+                    <p class="text-sm text-gray-600">Perlu Bayar Denda</p>
                 </div>
             </div>
         </div>
@@ -83,6 +83,21 @@
             <div>
                 <h3 class="text-lg font-semibold text-red-800">Perhatian: Ada Peminjaman Terlambat!</h3>
                 <p class="text-red-700 mt-1">Anda memiliki {{ $overdueItems->count() }} peminjaman yang sudah melewati batas waktu. Segera ajukan pengembalian untuk menghindari denda tambahan.</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Payment Required Alert -->
+    @if($returnHistory->where('status_pengembalian', 'payment_required')->count() > 0)
+    <div class="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-6">
+        <div class="flex items-center">
+            <svg class="w-6 h-6 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+            </svg>
+            <div>
+                <h3 class="text-lg font-semibold text-orange-800">Pembayaran Denda Diperlukan!</h3>
+                <p class="text-orange-700 mt-1">Anda memiliki {{ $returnHistory->where('status_pengembalian', 'payment_required')->count() }} pengembalian yang memerlukan pembayaran denda. Klik tombol "Bayar Denda" untuk melanjutkan.</p>
             </div>
         </div>
     </div>
@@ -165,15 +180,37 @@
                     <div class="flex-1">
                         <div class="flex items-center">
                             <h3 class="text-lg font-semibold text-gray-900">{{ $pengembalian->peminjaman->kode_peminjaman }}</h3>
-                            @if($pengembalian->status_pengembalian === 'pending')
-                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    Menunggu Proses
-                                </span>
-                            @elseif($pengembalian->status_pengembalian === 'completed')
-                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    Selesai
-                                </span>
-                            @endif
+                                            @if($pengembalian->status_pengembalian === 'pending')
+                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Menunggu Proses
+                    </span>
+                @elseif($pengembalian->status_pengembalian === 'payment_required')
+                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        Perlu Bayar Denda
+                    </span>
+                @elseif($pengembalian->status_pengembalian === 'payment_uploaded')
+                    @if($pengembalian->status_pembayaran_denda === 'uploaded')
+                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            Menunggu Verifikasi Pembayaran
+                        </span>
+                    @elseif($pengembalian->status_pembayaran_denda === 'verified')
+                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Pembayaran Diverifikasi
+                        </span>
+                    @elseif($pengembalian->status_pembayaran_denda === 'rejected')
+                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            Pembayaran Ditolak
+                        </span>
+                    @else
+                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            Menunggu Verifikasi Pembayaran
+                        </span>
+                    @endif
+                @elseif($pengembalian->status_pengembalian === 'completed' || $pengembalian->status_pengembalian === 'fully_completed')
+                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Selesai
+                    </span>
+                @endif
                         </div>
                         <p class="text-sm text-gray-600 mt-1">
                             Tanggal Pengembalian: {{ \Carbon\Carbon::parse($pengembalian->tanggal_pengembalian)->format('d/m/Y') }}
@@ -203,7 +240,15 @@
                             </svg>
                             Detail
                         </a>
-                        @if($pengembalian->status_pengembalian === 'pending')
+                        @if($pengembalian->status_pengembalian === 'payment_required')
+                        <a href="{{ route('user.pengembalian.penalty-payment', $pengembalian->id_pengembalian) }}" 
+                           class="inline-flex items-center px-3 py-2 bg-red-600 text-sm font-medium rounded-md text-white hover:bg-red-700">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                            </svg>
+                            Bayar Denda
+                        </a>
+                        @elseif($pengembalian->status_pengembalian === 'pending')
                         <form action="{{ route('user.pengembalian.cancel', $pengembalian->id_pengembalian) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')

@@ -113,7 +113,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-900">{{ $item->barang->nama_barang }}</p>
-                            <p class="text-xs text-gray-500">{{ $item->barang->admin->nama_admin ?? 'Admin' }}</p>
+                                                                        <p class="text-xs text-gray-500">{{ $item->barang->admin->nama_lengkap ?? 'Admin' }}</p>
                         </div>
                     </div>
                     <div class="text-right">
@@ -179,8 +179,8 @@
                 </a>
                 <span class="text-sm text-gray-500">Menunggu review admin</span>
 
-            @elseif($peminjaman->status_pengajuan === 'approved')
-                <!-- Approved - can confirm -->
+            @elseif($peminjaman->status_pengajuan === 'approved' && $peminjaman->status_peminjaman !== 'ongoing')
+                <!-- Approved - can confirm (only if not already ongoing) -->
                 @php
                     $allApproved = $peminjaman->peminjamanBarangs->every(function($item) {
                         return $item->status_persetujuan === 'approved';
@@ -197,6 +197,36 @@
                     </form>
                 @else
                     <span class="text-sm text-gray-500">Menunggu persetujuan semua barang</span>
+                @endif
+
+            @elseif($peminjaman->status_pengajuan === 'approved' && $peminjaman->status_peminjaman === 'ongoing')
+                <!-- Already confirmed and ongoing - check if return request exists -->
+                @if($peminjaman->pengembalian)
+                    @if($peminjaman->pengembalian->status_pengembalian === 'pending')
+                        <span class="text-sm text-orange-600">Menunggu Verifikasi Pengembalian</span>
+                    @elseif($peminjaman->pengembalian->status_pengembalian === 'approved')
+                        <span class="text-sm text-green-600">Pengembalian Disetujui</span>
+                    @elseif($peminjaman->pengembalian->status_pengembalian === 'completed')
+                        <span class="text-sm text-green-600">Pengembalian Selesai</span>
+                    @elseif($peminjaman->pengembalian->status_pengembalian === 'payment_required')
+                        <a href="{{ route('user.pengembalian.penalty-payment', $peminjaman->pengembalian->id_pengembalian) }}" 
+                           class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                            Bayar Denda
+                        </a>
+                        <span class="text-sm text-red-600">Denda Perlu Dibayar</span>
+                    @else
+                        <span class="text-sm text-orange-600">{{ ucfirst(str_replace('_', ' ', $peminjaman->pengembalian->status_pengembalian)) }}</span>
+                    @endif
+                @else
+                    <!-- No return request yet, show button -->
+                    <form action="{{ route('user.pengembalian.submit', $peminjaman->id_peminjaman) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" 
+                                class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                                onclick="return confirm('Yakin ingin mengajukan pengembalian untuk semua barang?')">
+                            Ajukan Pengembalian
+                        </button>
+                    </form>
                 @endif
 
             @elseif($peminjaman->status_pengajuan === 'confirmed')
@@ -255,11 +285,34 @@
                 </a>
 
             @elseif($peminjaman->status_peminjaman === 'ongoing' && $peminjaman->status_pengajuan !== 'rejected' && $peminjaman->status_pengajuan !== 'partial')
-                <!-- Ongoing loan (only if not rejected and not partial) -->
-                <a href="{{ route('user.peminjaman.return', $peminjaman->id_peminjaman) }}" 
-                   class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors text-sm">
-                    Ajukan Pengembalian
-                </a>
+                <!-- Ongoing loan (only if not rejected and not partial) - check if return request exists -->
+                @if($peminjaman->pengembalian)
+                    @if($peminjaman->pengembalian->status_pengembalian === 'pending')
+                        <span class="text-sm text-orange-600">Menunggu Verifikasi Pengembalian</span>
+                    @elseif($peminjaman->pengembalian->status_pengembalian === 'approved')
+                        <span class="text-sm text-green-600">Pengembalian Disetujui</span>
+                    @elseif($peminjaman->pengembalian->status_pengembalian === 'completed')
+                        <span class="text-sm text-green-600">Pengembalian Selesai</span>
+                    @elseif($peminjaman->pengembalian->status_pengembalian === 'payment_required')
+                        <a href="{{ route('user.pengembalian.penalty-payment', $peminjaman->pengembalian->id_pengembalian) }}" 
+                           class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                            Bayar Denda
+                        </a>
+                        <span class="text-sm text-red-600">Denda Perlu Dibayar</span>
+                    @else
+                        <span class="text-sm text-orange-600">{{ ucfirst(str_replace('_', ' ', $peminjaman->pengembalian->status_pengembalian)) }}</span>
+                    @endif
+                @else
+                    <!-- No return request yet, show button -->
+                    <form action="{{ route('user.pengembalian.submit', $peminjaman->id_peminjaman) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" 
+                                class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors text-sm"
+                                onclick="return confirm('Yakin ingin mengajukan pengembalian untuk semua barang?')">
+                            Ajukan Pengembalian
+                        </button>
+                    </form>
+                @endif
 
             @elseif($peminjaman->status_pengajuan === 'rejected')
                 <!-- Rejected/Cancelled applications -->

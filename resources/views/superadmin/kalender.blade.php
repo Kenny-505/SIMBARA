@@ -251,7 +251,7 @@
                             
                             // Get events for this month with filters
                             $query = \App\Models\Peminjaman::with(['user', 'peminjamanBarangs.barang'])
-                                ->where('status_pengajuan', 'confirmed')
+                                ->whereIn('status_pengajuan', ['approved', 'confirmed'])
                                 ->where(function($q) use ($startDate, $endDate) {
                                     $q->whereBetween('tanggal_mulai', [$startDate, $endDate])
                                       ->orWhereBetween('tanggal_selesai', [$startDate, $endDate])
@@ -273,8 +273,10 @@
                                 $status = request('status');
                                 if ($status === 'confirmed') {
                                     $query->where('status_pengajuan', 'confirmed');
+                                } elseif ($status === 'approved') {
+                                    $query->where('status_pengajuan', 'approved');
                                 } elseif ($status === 'ongoing') {
-                                    $query->where('status_pengajuan', 'confirmed')
+                                    $query->whereIn('status_pengajuan', ['approved', 'confirmed'])
                                           ->whereDate('tanggal_mulai', '<=', now())
                                           ->whereDate('tanggal_selesai', '>=', now());
                                 } elseif ($status === 'returned') {

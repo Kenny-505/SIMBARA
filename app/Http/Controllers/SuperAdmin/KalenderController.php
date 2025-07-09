@@ -50,7 +50,7 @@ class KalenderController extends Controller
         $adminId = $request->get('admin_id');
         
         $query = Peminjaman::with(['user', 'peminjamanBarangs.barang.admin'])
-            ->where('status_pengajuan', 'confirmed') // Hanya tampilkan yang sudah confirmed
+            ->whereIn('status_pengajuan', ['approved', 'confirmed']) // Tampilkan yang sudah approved dan confirmed
             ->where(function($q) use ($start, $end) {
                 $q->whereBetween('tanggal_mulai', [$start, $end])
                   ->orWhereBetween('tanggal_selesai', [$start, $end])
@@ -208,7 +208,7 @@ class KalenderController extends Controller
         // Calculate utilization (percentage of days with confirmed bookings)
         $daysWithBookings = Peminjaman::selectRaw('DATE(tanggal_mulai) as booking_date')
             ->whereBetween('tanggal_mulai', [$startOfMonth, $endOfMonth])
-            ->where('status_pengajuan', 'confirmed')
+            ->whereIn('status_pengajuan', ['approved', 'confirmed'])
             ->when($adminId, function($q) use ($adminId) {
                 $q->whereHas('peminjamanBarangs.barang', function($q2) use ($adminId) {
                     $q2->where('id_admin', $adminId);
@@ -225,7 +225,7 @@ class KalenderController extends Controller
             'total_events' => $totalEvents,
             'total_bookings' => $totalEvents,
             'this_month' => $totalEvents,
-            'active_bookings' => (clone $baseQuery)->where('status_pengajuan', 'confirmed')
+            'active_bookings' => (clone $baseQuery)->whereIn('status_pengajuan', ['approved', 'confirmed'])
                 ->where('status_peminjaman', 'ongoing')->count(),
             'pending_bookings' => (clone $baseQuery)->where('status_pengajuan', 'pending_approval')->count(),
             'completed_bookings' => (clone $baseQuery)->where('status_peminjaman', 'returned')->count(),
@@ -323,7 +323,7 @@ class KalenderController extends Controller
     {
         $query = Peminjaman::with(['user', 'peminjamanBarangs.barang'])
             ->where('tanggal_mulai', '>=', now())
-            ->where('status_pengajuan', 'confirmed')
+            ->whereIn('status_pengajuan', ['approved', 'confirmed'])
             ->orderBy('tanggal_mulai', 'asc')
             ->limit(5);
 
@@ -356,7 +356,7 @@ class KalenderController extends Controller
             $query = Peminjaman::with(['user', 'peminjamanBarangs.barang'])
                 ->where('tanggal_mulai', '<=', $date->format('Y-m-d'))
                 ->where('tanggal_selesai', '>=', $date->format('Y-m-d'))
-                ->where('status_pengajuan', 'confirmed');
+                ->whereIn('status_pengajuan', ['approved', 'confirmed']);
 
             if ($adminId) {
                 $query->whereHas('peminjamanBarangs.barang', function($q) use ($adminId) {

@@ -428,8 +428,7 @@ class PengembalianController extends Controller
                 'jumlah_kembali' => $itemData['jumlah_kembali'],
                 'kondisi_barang' => $averageCondition,
                 'denda_kerusakan' => $totalItemPenalty,
-                'keterangan_kerusakan' => "Kondisi per unit: {$conditionsText}",
-                'subtotal_denda' => $totalItemPenalty
+                'keterangan_kerusakan' => "Kondisi per unit: {$conditionsText}"
             ]);
             
             // Store item for potential stock return (don't return immediately)

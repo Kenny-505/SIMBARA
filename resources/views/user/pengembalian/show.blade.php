@@ -256,12 +256,8 @@
                                 </span>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-600">Denda per Item</p>
-                                <p class="font-medium text-gray-900">Rp {{ number_format($item->denda_per_item, 0, ',', '.') }}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600">Subtotal Denda</p>
-                                <p class="font-medium text-gray-900">Rp {{ number_format($item->subtotal_denda, 0, ',', '.') }}</p>
+                                <p class="text-sm text-gray-600">Total Denda Item</p>
+                                <p class="font-medium text-gray-900">Rp {{ number_format($item->denda_kerusakan, 0, ',', '.') }}</p>
                             </div>
                         </div>
                         @if($item->catatan_user)

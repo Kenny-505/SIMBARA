@@ -20,7 +20,7 @@
     </div>
 
     <!-- Status and Processing Information -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <div class="mb-6">
         <!-- Status Card -->
         <div class="bg-white rounded-lg shadow-sm p-6">
             <div class="flex items-center justify-between mb-4">
@@ -59,35 +59,7 @@
             </div>
         </div>
 
-        <!-- Penalty Summary -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Ringkasan Denda</h2>
-            @if($pengembalian->total_denda > 0)
-                <div class="p-4 bg-red-50 rounded-lg">
-                    <div class="flex items-center">
-                        <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                        </svg>
-                        <div>
-                            <p class="text-sm text-red-600">Total Denda</p>
-                            <p class="text-2xl font-bold text-red-700">Rp {{ number_format($pengembalian->total_denda, 0, ',', '.') }}</p>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="p-4 bg-green-50 rounded-lg">
-                    <div class="flex items-center">
-                        <svg class="w-6 h-6 text-green-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <div>
-                            <p class="text-sm text-green-600">Tidak Ada Denda</p>
-                            <p class="text-lg font-medium text-green-700">Barang dikembalikan dalam kondisi baik</p>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        </div>
+
     </div>
 
     <!-- Loan Information -->
@@ -148,8 +120,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Barang</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kondisi</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Denda/Item</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Denda</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catatan</th>
                     </tr>
                 </thead>
@@ -188,11 +159,8 @@
                                 {{ ucfirst($item->kondisi_barang) }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            Rp {{ number_format($item->denda_per_item, 0, ',', '.') }}
-                        </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            Rp {{ number_format($item->subtotal_denda, 0, ',', '.') }}
+                            Rp {{ number_format($item->denda_kerusakan, 0, ',', '.') }}
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-900 max-w-xs">
                             @if($item->catatan_user)
@@ -219,15 +187,7 @@
     </div>
     @endif
 
-    <!-- Admin Notes -->
-    @if($pengembalian->notes_admin)
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Catatan Admin</h2>
-        <div class="bg-blue-50 rounded-lg p-4">
-            <p class="text-gray-900">{{ $pengembalian->notes_admin }}</p>
-        </div>
-    </div>
-    @endif
+
 
     <!-- Processing Timeline -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -334,7 +294,7 @@
         </a>
         
         @if($pengembalian->status_pengembalian === 'pending')
-        <a href="{{ route('superadmin.pengembalian.create', $pengembalian->peminjaman->id_peminjaman) }}" 
+        <a href="{{ route('superadmin.pengembalian.process', $pengembalian->id_pengembalian) }}" 
            class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors duration-200">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>

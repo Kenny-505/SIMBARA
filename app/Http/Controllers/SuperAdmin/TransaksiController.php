@@ -189,33 +189,45 @@ class TransaksiController extends Controller
      */
     public function showPaymentProof($id)
     {
-        $transaksi = Transaksi::findOrFail($id);
+        $transaksi = Transaksi::with('pengembalian')->findOrFail($id);
         
-        if (!$transaksi->bukti_pembayaran) {
-            abort(404, 'Bukti pembayaran tidak ditemukan.');
+        $buktiPembayaran = null;
+        $filename = 'bukti_pembayaran_' . $id . '.jpg';
+        
+        // Determine where to get the payment proof based on transaction type
+        if ($transaksi->jenis_transaksi === 'sewa') {
+            // For sewa payments, get from transaksi table
+            $buktiPembayaran = $transaksi->bukti_pembayaran;
+            
+            // Check if it's dummy data from migration
+            if ($buktiPembayaran === 'dummy_payment_proof') {
+                $message = "Bukti pembayaran belum tersedia.\n\nData ini berasal dari migrasi.\nUser perlu mengupload ulang bukti pembayaran yang sebenarnya.";
+                return response($message, 404)->header('Content-Type', 'text/plain');
+            }
+        } else if ($transaksi->jenis_transaksi === 'denda') {
+            // For denda payments, get from pengembalian table
+            if ($transaksi->pengembalian && $transaksi->pengembalian->bukti_pembayaran_denda) {
+                $buktiPembayaran = base64_decode($transaksi->pengembalian->bukti_pembayaran_denda);
+                $filename = 'bukti_pembayaran_denda_' . $id . '.jpg';
+            }
         }
         
-        // Check if it's dummy data from migration
-        if ($transaksi->bukti_pembayaran === 'dummy_payment_proof') {
-            // Return a placeholder image or message
-            $message = "Bukti pembayaran belum tersedia.\n\nData ini berasal dari migrasi.\nUser perlu mengupload ulang bukti pembayaran yang sebenarnya.";
-            
-            return response($message, 404)
-                ->header('Content-Type', 'text/plain');
+        if (!$buktiPembayaran) {
+            abort(404, 'Bukti pembayaran tidak ditemukan.');
         }
         
         // For real image data, detect content type
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($transaksi->bukti_pembayaran);
+        $mimeType = $finfo->buffer($buktiPembayaran);
         
         // Default to jpeg if detection fails
         if (!$mimeType || strpos($mimeType, 'image/') !== 0) {
             $mimeType = 'image/jpeg';
         }
         
-        return response($transaksi->bukti_pembayaran)
+        return response($buktiPembayaran)
             ->header('Content-Type', $mimeType)
-            ->header('Content-Disposition', 'inline; filename="bukti_pembayaran_' . $id . '.jpg"');
+            ->header('Content-Disposition', 'inline; filename="' . $filename . '"');
     }
     
     /**

@@ -50,10 +50,10 @@
                 <div class="p-4 border-b border-gray-200">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                            <span class="text-white font-medium">{{ substr(auth()->guard('admin')->user()->nama_admin ?? 'A', 0, 1) }}</span>
+                            <span class="text-white font-medium">{{ substr(auth()->guard('admin')->user()->nama_lengkap ?? 'A', 0, 1) }}</span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->guard('admin')->user()->nama_admin ?? 'Admin' }}</p>
+                            <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->guard('admin')->user()->nama_lengkap ?? 'Admin' }}</p>
                             <p class="text-xs text-gray-500">Admin Panel</p>
                         </div>
                     </div>
@@ -135,13 +135,13 @@
 
                             <!-- Admin Info -->
                             <div class="text-right">
-                                <p class="text-sm font-medium text-gray-900">{{ auth()->guard('admin')->user()->nama_admin ?? 'Admin' }}</p>
+                                <p class="text-sm font-medium text-gray-900">{{ auth()->guard('admin')->user()->nama_lengkap ?? 'Admin' }}</p>
                                 <p class="text-xs text-gray-500">{{ auth()->guard('admin')->user()->username ?? 'admin' }}</p>
                             </div>
 
                             <!-- Admin Avatar -->
                             <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                                <span class="text-white font-medium">{{ substr(auth()->guard('admin')->user()->nama_admin ?? 'A', 0, 1) }}</span>
+                                <span class="text-white font-medium">{{ substr(auth()->guard('admin')->user()->nama_lengkap ?? 'A', 0, 1) }}</span>
                             </div>
                         </div>
                     </div>

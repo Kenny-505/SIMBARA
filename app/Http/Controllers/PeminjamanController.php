@@ -20,7 +20,7 @@ class PeminjamanController extends Controller
     {
         $user = Auth::guard('user')->user();
         
-        $peminjamans = Peminjaman::with(['peminjamanBarangs.barang.admin', 'transaksi'])
+        $peminjamans = Peminjaman::with(['peminjamanBarangs.barang.admin', 'transaksi', 'pengembalian'])
             ->where('id_user', $user->id_user)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -71,7 +71,7 @@ class PeminjamanController extends Controller
     {
         $user = Auth::guard('user')->user();
         
-        $peminjamans = Peminjaman::with(['peminjamanBarangs.barang.admin'])
+        $peminjamans = Peminjaman::with(['peminjamanBarangs.barang.admin', 'pengembalian'])
             ->where('id_user', $user->id_user)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -273,47 +273,29 @@ class PeminjamanController extends Controller
      */
     public function confirmPeminjaman($id)
     {
-        \Log::info('confirmPeminjaman called', ['id' => $id]);
-        
         try {
             $user = Auth::guard('user')->user();
-            \Log::info('User authenticated', ['user_id' => $user->id_user, 'role' => $user->role->nama_role]);
             
             $peminjaman = Peminjaman::with('peminjamanBarangs')
                 ->where('id_peminjaman', $id)
                 ->where('id_user', $user->id_user)
                 ->where('status_pengajuan', 'approved')
                 ->firstOrFail();
-            
-            \Log::info('Peminjaman found', [
-                'kode' => $peminjaman->kode_peminjaman,
-                'status_pengajuan' => $peminjaman->status_pengajuan,
-                'total_items' => $peminjaman->peminjamanBarangs->count()
-            ]);
 
             // Check if all active items (not deleted by user) are approved
             $activeItems = $peminjaman->peminjamanBarangs->whereNull('user_action');
             $allApproved = $activeItems->every(function($item) {
                 return $item->status_persetujuan === 'approved';
             });
-            
-            \Log::info('Items check', [
-                'active_items' => $activeItems->count(),
-                'all_approved' => $allApproved,
-                'item_statuses' => $activeItems->pluck('status_persetujuan')->toArray()
-            ]);
 
             if (!$allApproved) {
-                \Log::warning('Not all items approved');
                 return back()->with('error', 'Tidak semua barang telah disetujui admin.');
             }
 
             $isNonCivitas = $user->role->nama_role === 'user_non_fmipa';
-            \Log::info('User type check', ['is_non_civitas' => $isNonCivitas, 'total_biaya' => $peminjaman->total_biaya]);
 
             if ($isNonCivitas && $peminjaman->total_biaya > 0) {
                 // Non-civitas needs to upload payment proof after confirmation
-                \Log::info('Updating status for non-civitas with payment');
                 $peminjaman->update([
                     'status_pengajuan' => 'confirmed',
                     'status_pembayaran' => 'pending'
@@ -323,10 +305,8 @@ class PeminjamanController extends Controller
                     ->with('info', 'Peminjaman berhasil dikonfirmasi. Silakan upload bukti pembayaran untuk melanjutkan proses.');
             } else {
                 // Civitas can proceed directly (or non-civitas with no cost)
-                \Log::info('Processing confirmed loan for civitas');
                 $this->processConfirmedLoan($peminjaman);
                 
-                \Log::info('Redirecting to peminjaman index with success message');
                 return redirect()->route('user.peminjaman.index')
                     ->with('success', 'Peminjaman berhasil dikonfirmasi. Silakan ambil barang sesuai jadwal.');
             }
@@ -512,43 +492,23 @@ class PeminjamanController extends Controller
      */
     private function processConfirmedLoan($peminjaman)
     {
-        \Log::info('processConfirmedLoan started', ['peminjaman_id' => $peminjaman->id_peminjaman]);
-        
         DB::beginTransaction();
         try {
             // Reduce stock for each active item (not deleted by user)
             $activeItems = $peminjaman->peminjamanBarangs->whereNull('user_action');
-            \Log::info('Processing active items', ['count' => $activeItems->count()]);
             
             foreach ($activeItems as $item) {
                 $barang = $item->barang;
-                $oldStock = $barang->stok_tersedia;
                 $barang->decrement('stok_tersedia', $item->jumlah_pinjam);
-                $newStock = $barang->fresh()->stok_tersedia;
-                
-                \Log::info('Stock updated', [
-                    'barang_id' => $barang->id_barang,
-                    'nama_barang' => $barang->nama_barang,
-                    'old_stock' => $oldStock,
-                    'reduced_by' => $item->jumlah_pinjam,
-                    'new_stock' => $newStock
-                ]);
             }
 
             // Update status
-            \Log::info('Updating peminjaman status');
             $peminjaman->update([
-                'status_peminjaman' => 'ongoing',
-                'status_pembayaran' => 'verified'
-            ]);
-            
-            \Log::info('Status updated', [
                 'status_peminjaman' => 'ongoing',
                 'status_pembayaran' => 'verified'
             ]);
 
             DB::commit();
-            \Log::info('processConfirmedLoan completed successfully');
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Error in processConfirmedLoan', [

@@ -232,8 +232,8 @@
                                 @foreach($adminItems as $item)
                         <tr class="hover:bg-gray-50 {{ $item->user_action === 'deleted' ? 'bg-red-50 opacity-75' : '' }}">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @if($item->barang->gambar_1 && file_exists(storage_path('app/public/images/barang/' . $item->barang->gambar_1)))
-                                    <img src="{{ asset('storage/images/barang/' . $item->barang->gambar_1) }}"
+                                @if($item->barang->foto_1)
+                                    <img src="data:image/jpeg;base64,{{ base64_encode($item->barang->foto_1) }}"
                                          alt="{{ $item->barang->nama_barang }}"
                                          class="w-16 h-16 object-cover rounded-lg {{ $item->user_action === 'deleted' ? 'grayscale' : '' }}">
                                 @else

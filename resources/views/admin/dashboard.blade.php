@@ -165,14 +165,14 @@
                                 @endif
                                              </div>
                                          </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
+                                                <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm text-gray-900">
-                                {{ $peminjaman->tanggal_pinjam ? \Carbon\Carbon::parse($peminjaman->tanggal_pinjam)->format('d/m/Y') : 'N/A' }}
+                                {{ $peminjaman->tanggal_mulai ? \Carbon\Carbon::parse($peminjaman->tanggal_mulai)->format('d/m/Y') : 'N/A' }}
                             </div>
                             <div class="text-sm text-gray-500">
-                                s/d {{ $peminjaman->tanggal_kembali ? \Carbon\Carbon::parse($peminjaman->tanggal_kembali)->format('d/m/Y') : 'N/A' }}
+                                s/d {{ $peminjaman->tanggal_selesai ? \Carbon\Carbon::parse($peminjaman->tanggal_selesai)->format('d/m/Y') : 'N/A' }}
                             </div>
-                                        </td>
+                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                             @switch($peminjaman->status_pengajuan)
                                 @case('draft')

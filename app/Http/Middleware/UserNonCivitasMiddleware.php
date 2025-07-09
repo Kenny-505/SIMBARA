@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class UserNonCivitasMiddleware
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        // Check if user is authenticated as user
+        if (!auth()->guard('user')->check()) {
+            return redirect()->route('login')->with('error', 'Silakan login sebagai user terlebih dahulu.');
+        }
+
+        // Check if the authenticated user is active
+        $user = auth()->guard('user')->user();
+        if (!$user || !$user->is_active) {
+            auth()->guard('user')->logout();
+            return redirect()->route('login')->with('error', 'Akun user tidak aktif.');
+        }
+
+        // Check if the authenticated user is non-civitas akademik
+        if (!$user || $user->role->nama_role !== 'user_non_fmipa') {
+            abort(403, 'Akses ditolak. Hanya User Non-Civitas Akademik yang dapat mengakses halaman ini.');
+        }
+
+        // Check if account is not expired
+        if ($user->tanggal_berakhir && $user->tanggal_berakhir < now()) {
+            auth()->guard('user')->logout();
+            return redirect()->route('login')->with('error', 'Akun Anda telah kedaluwarsa. Silakan daftar ulang.');
+        }
+
+        return $next($request);
+    }
+}

@@ -340,10 +340,7 @@ Route::middleware(['auth:user'])->prefix('user')->name('user.')->group(function 
         Route::get('/stats/ajax', [TransaksiController::class, 'getStats'])->name('stats');
     });
     
-    // Profile Route
-    Route::get('/profile', function () {
-        return view('user.profile');
-    })->name('profile');
+
     
     // Pengembalian Routes
     Route::prefix('pengembalian')->name('pengembalian.')->group(function () {

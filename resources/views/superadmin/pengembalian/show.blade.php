@@ -90,22 +90,49 @@
     <!-- User Information -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Informasi Peminjam</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <p class="text-sm text-gray-600">Nama Penanggung Jawab</p>
-                <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->user->nama_penanggung_jawab }}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-600">Nama Lembaga</p>
+                    <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->user->nama_lembaga ?? 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Nama Pengambil</p>
+                    <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->nama_pengambil ?? '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Nomor Identitas Pengambil</p>
+                    <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->no_identitas_pengambil ?? '-' }}</p>
+                </div>
             </div>
-            <div>
-                <p class="text-sm text-gray-600">Organisasi</p>
-                <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->user->nama_organisasi }}</p>
-            </div>
-            <div>
-                <p class="text-sm text-gray-600">Email</p>
-                <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->user->email }}</p>
-            </div>
-            <div>
-                <p class="text-sm text-gray-600">Nomor Telepon</p>
-                <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->user->nomor_telepon }}</p>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm text-gray-600">Nomor HP Pengambil</p>
+                    <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->no_hp_pengambil ?? '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Penanggung Jawab Akun</p>
+                    <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->user->nama_penanggung_jawab ?? 'N/A' }}</p>
+                    <p class="text-xs text-gray-500">{{ $pengembalian->peminjaman->user->email ?? '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600">Tipe User</p>
+                    <p class="font-medium text-gray-900">
+                        @if($pengembalian->peminjaman->user->role && $pengembalian->peminjaman->user->role->nama_role === 'user_fmipa')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                Civitas FMIPA
+                            </span>
+                        @elseif($pengembalian->peminjaman->user->role && $pengembalian->peminjaman->user->role->nama_role === 'user_non_fmipa')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                Non-Civitas FMIPA
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                Unknown
+                            </span>
+                        @endif
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -129,8 +156,8 @@
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                @if($item->barang->foto_barang)
-                                    <img src="data:image/jpeg;base64,{{ base64_encode($item->barang->foto_barang) }}" 
+                                @if($item->barang->foto_1)
+                                    <img src="data:image/jpeg;base64,{{ base64_encode($item->barang->foto_1) }}" 
                                          alt="{{ $item->barang->nama_barang }}"
                                          class="w-12 h-12 object-cover rounded-lg mr-3">
                                 @else
@@ -142,7 +169,7 @@
                                 @endif
                                 <div>
                                     <p class="text-sm font-medium text-gray-900">{{ $item->barang->nama_barang }}</p>
-                                    <p class="text-sm text-gray-500">{{ $item->barang->kode_barang }}</p>
+                                    <p class="text-sm text-gray-500">ID: {{ $item->barang->id_barang }}</p>
                                 </div>
                             </div>
                         </td>
@@ -191,94 +218,86 @@
 
     <!-- Processing Timeline -->
     <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Timeline Proses</h2>
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Timeline Proses</h3>
+        
         <div class="flow-root">
             <ul class="-mb-8">
-                <!-- User Request -->
-                <li>
-                    <div class="relative pb-8">
-                        <div class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"></div>
-                        <div class="relative flex space-x-3">
-                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 ring-8 ring-white">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                                </svg>
-                            </div>
-                            <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                <div>
-                                    <p class="text-sm text-gray-500">Permintaan pengembalian diajukan oleh user</p>
-                                </div>
-                                <div class="whitespace-nowrap text-right text-sm text-gray-500">
-                                    <time>{{ $pengembalian->created_at->format('d/m/Y H:i') }}</time>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
+                @php
+                    $events = [];
+                    
+                    // User request event
+                    $events[] = [
+                        'type' => 'created',
+                        'icon' => 'arrow-right-circle',
+                        'title' => 'Permintaan pengembalian diajukan oleh user',
+                        'date' => $pengembalian->created_at,
+                    ];
+                    
+                    // Processing completed event
+                    if($pengembalian->status_pengembalian === 'completed') {
+                        $events[] = [
+                            'type' => 'completed',
+                            'icon' => 'check-circle',
+                            'title' => 'Pengembalian selesai diproses',
+                            'date' => $pengembalian->updated_at,
+                        ];
+                        
+                        // Stock restoration event
+                        $events[] = [
+                            'type' => 'restored',
+                            'icon' => 'database',
+                            'title' => 'Stok barang dikembalikan ke inventaris',
+                            'date' => $pengembalian->updated_at,
+                        ];
+                    }
+                @endphp
 
-                <!-- Processing Status -->
+                @forelse($events as $index => $event)
                 <li>
                     <div class="relative pb-8">
-                        @if($pengembalian->status_pengembalian === 'completed')
-                            <div class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"></div>
+                        @if($index < count($events) - 1)
+                            <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
                         @endif
                         <div class="relative flex space-x-3">
-                            <div class="flex h-8 w-8 items-center justify-center rounded-full 
-                                @if($pengembalian->status_pengembalian === 'completed') bg-green-500 @else bg-yellow-500 @endif ring-8 ring-white">
-                                @if($pengembalian->status_pengembalian === 'completed')
-                                    <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                @else
-                                    <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                @endif
-                            </div>
-                            <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                                <div>
-                                    <p class="text-sm text-gray-500">
-                                        @if($pengembalian->status_pengembalian === 'completed')
-                                            Pengembalian selesai diproses
-                                        @else
-                                            Menunggu proses verifikasi
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="whitespace-nowrap text-right text-sm text-gray-500">
-                                    @if($pengembalian->status_pengembalian === 'completed')
-                                        <time>{{ $pengembalian->updated_at->format('d/m/Y H:i') }}</time>
-                                    @else
-                                        <span class="text-yellow-600">Pending</span>
+                            <div>
+                                <span class="h-8 w-8 rounded-full 
+                                    @if($event['type'] == 'created') bg-blue-500
+                                    @elseif($event['type'] == 'completed') bg-green-500
+                                    @elseif($event['type'] == 'restored') bg-purple-500
+                                    @else bg-gray-300
                                     @endif
-                                </div>
+                                    flex items-center justify-center ring-8 ring-white">
+                                    <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        @if($event['icon'] == 'arrow-right-circle')
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        @elseif($event['icon'] == 'check-circle')
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        @elseif($event['icon'] == 'database')
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                                        @else
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        @endif
+                                    </svg>
+                                </span>
                             </div>
-                        </div>
-                    </div>
-                </li>
-
-                <!-- Stock Restoration (if completed) -->
-                @if($pengembalian->status_pengembalian === 'completed')
-                <li>
-                    <div class="relative">
-                        <div class="relative flex space-x-3">
-                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-purple-500 ring-8 ring-white">
-                                <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
-                                </svg>
-                            </div>
-                            <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                            <div class="min-w-0 flex-1 pt-1.5">
                                 <div>
-                                    <p class="text-sm text-gray-500">Stok barang dikembalikan ke inventaris</p>
+                                    <p class="text-sm font-medium text-gray-900">{{ $event['title'] }}</p>
                                 </div>
-                                <div class="whitespace-nowrap text-right text-sm text-gray-500">
-                                    <time>{{ $pengembalian->updated_at->format('d/m/Y H:i') }}</time>
+                                <div class="mt-2 text-sm text-gray-500">
+                                    <time datetime="{{ $event['date'] }}">
+                                        {{ \Carbon\Carbon::parse($event['date'])->format('d/m/Y H:i') }}
+                                    </time>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
-                @endif
+                @empty
+                <li class="text-center text-gray-500 py-4">
+                    Belum ada aktivitas
+                </li>
+                @endforelse
             </ul>
         </div>
     </div>

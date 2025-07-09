@@ -374,74 +374,7 @@
     @endif
                     </div>
 
-<!-- Penalty Summary -->
-<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- Overdue Items -->
-    <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Barang Terlambat</h3>
-        </div>
-        <div class="p-6">
-            @if($overdueItems->count() > 0)
-                <div class="space-y-3">
-                    @foreach($overdueItems->take(5) as $item)
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">{{ $item->kode_peminjaman }}</p>
-                                <p class="text-sm text-gray-500">{{ $item->user->nama_penanggung_jawab ?? 'N/A' }}</p>
-                        </div>
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-red-600">
-                                    {{ $item->tanggal_selesai->diffInDays(now()) }} hari
-                                </p>
-                                <p class="text-xs text-gray-500">Sejak {{ $item->tanggal_selesai->format('d/m/Y') }}</p>
-                        </div>
-                        </div>
-                    @endforeach
-                </div>
-                @if($overdueItems->count() > 5)
-                    <div class="mt-4 text-center">
-                        <a href="{{ route('superadmin.peminjaman.index', ['status_peminjaman' => 'ongoing']) }}" 
-                           class="text-blue-600 hover:text-blue-900 text-sm">
-                            Lihat {{ $overdueItems->count() - 5 }} lainnya
-                        </a>
-                    </div>
-                @endif
-            @else
-                <p class="text-gray-500 text-center py-4">Tidak ada barang terlambat</p>
-            @endif
-                        </div>
-                    </div>
 
-    <!-- Recent Returns -->
-    <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Pengembalian Terbaru</h3>
-        </div>
-        <div class="p-6">
-            @if($recentReturns->count() > 0)
-                <div class="space-y-3">
-                    @foreach($recentReturns as $return)
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">{{ $return->peminjaman->kode_peminjaman }}</p>
-                                <p class="text-sm text-gray-500">{{ $return->peminjaman->user->nama_penanggung_jawab ?? 'N/A' }}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-gray-900">
-                                    Rp {{ number_format($return->total_denda, 0, ',', '.') }}
-                                </p>
-                                <p class="text-xs text-gray-500">{{ $return->tanggal_pengembalian_aktual->format('d/m/Y') }}</p>
-                        </div>
-                        </div>
-                    @endforeach
-                        </div>
-            @else
-                <p class="text-gray-500 text-center py-4">Belum ada pengembalian terbaru</p>
-            @endif
-                        </div>
-                    </div>
-                </div>
 
 <!-- Pending Processing Alert -->
 @if($stats['pending'] > 0)

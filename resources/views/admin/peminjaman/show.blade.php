@@ -50,19 +50,24 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-500">Nama Lembaga</label>
-                <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nama_lembaga }}</p>
+                <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nama_lembaga ?? 'N/A' }}</p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-500">Penanggung Jawab</label>
-                <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nama_penanggung_jawab }}</p>
+                <label class="block text-sm font-medium text-gray-500">Nama Pengambil</label>
+                <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->nama_pengambil ?? '-' }}</p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-500">Email</label>
-                <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->email }}</p>
+                <label class="block text-sm font-medium text-gray-500">Nomor Identitas Pengambil</label>
+                <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->no_identitas_pengambil ?? '-' }}</p>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-500">Nomor Telepon</label>
-                <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nomor_telepon ?? '-' }}</p>
+                <label class="block text-sm font-medium text-gray-500">Nomor HP Pengambil</label>
+                <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->no_hp_pengambil ?? '-' }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Penanggung Jawab Akun</label>
+                <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nama_penanggung_jawab ?? 'N/A' }}</p>
+                <p class="mt-1 text-xs text-gray-500">{{ $peminjaman->user->email ?? '-' }}</p>
             </div>
         </div>
         <div class="space-y-4">

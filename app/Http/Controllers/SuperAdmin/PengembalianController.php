@@ -65,20 +65,6 @@ class PengembalianController extends Controller
             ->orderBy('tanggal_selesai', 'asc')
             ->get();
         
-        // Get overdue items
-        $overdueItems = Peminjaman::where('status_peminjaman', 'ongoing')
-            ->whereDoesntHave('pengembalian')
-            ->where('tanggal_selesai', '<', now())
-            ->with(['user'])
-            ->orderBy('tanggal_selesai', 'asc')
-            ->get();
-        
-        // Get recent returns
-        $recentReturns = Pengembalian::with(['peminjaman.user'])
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
-            
         // Get penalty payments awaiting verification
         $paymentVerificationQueue = Pengembalian::with(['peminjaman.user'])
             ->where('status_pengembalian', 'payment_uploaded')
@@ -86,7 +72,7 @@ class PengembalianController extends Controller
             ->orderBy('tanggal_upload_pembayaran', 'asc')
             ->get();
         
-        return view('superadmin.pengembalian', compact('pengembalian', 'stats', 'readyForReturn', 'overdueItems', 'recentReturns', 'paymentVerificationQueue'));
+        return view('superadmin.pengembalian', compact('pengembalian', 'stats', 'readyForReturn', 'paymentVerificationQueue'));
     }
     
     /**

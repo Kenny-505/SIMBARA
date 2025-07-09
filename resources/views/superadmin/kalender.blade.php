@@ -353,75 +353,7 @@
                         </div>
                         </div>
 
-<!-- Upcoming Events -->
-<div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- Upcoming Events -->
-    <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Event Mendatang</h3>
-                        </div>
-        <div class="p-6">
-            @if($upcomingEvents->count() > 0)
-                <div class="space-y-4">
-                    @foreach($upcomingEvents as $event)
-                        <div class="flex items-center justify-between border-l-4 border-blue-500 pl-4">
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">{{ $event->tujuan_peminjaman }}</p>
-                                <p class="text-sm text-gray-500">{{ $event->user->nama_penanggung_jawab ?? 'N/A' }}</p>
-                                <p class="text-xs text-gray-400">{{ $event->tanggal_mulai->format('d/m/Y H:i') }}</p>
-                        </div>
-                            <div class="text-right">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                                    @if($event->status_pengajuan === 'pending_approval') bg-yellow-100 text-yellow-800
-                                    @elseif($event->status_pengajuan === 'approved') bg-green-100 text-green-800
-                                    @elseif($event->status_pengajuan === 'confirmed') bg-blue-100 text-blue-800
-                                    @else bg-gray-100 text-gray-800 @endif">
-                                    {{ ucfirst($event->status_pengajuan) }}
-                                </span>
-                        </div>
-                        </div>
-                    @endforeach
-                        </div>
-            @else
-                <p class="text-gray-500 text-center py-4">Tidak ada event mendatang</p>
-            @endif
-                        </div>
-                        </div>
 
-    <!-- Conflict Detection -->
-    <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Deteksi Konflik</h3>
-        </div>
-        <div class="p-6">
-            @if($conflicts->count() > 0)
-                <div class="space-y-4">
-                    @foreach($conflicts as $conflict)
-                        <div class="flex items-center justify-between border-l-4 border-red-500 pl-4">
-                            <div>
-                                <p class="text-sm font-medium text-red-900">{{ $conflict['date'] }}</p>
-                                <p class="text-sm text-gray-500">{{ $conflict['events']->count() }} event bertabrakan</p>
-                                <div class="text-xs text-gray-400">
-                                    @foreach($conflict['events'] as $event)
-                                        <div>{{ $event->tujuan_peminjaman }} ({{ $event->user->nama_lembaga ?? 'N/A' }})</div>
-                                    @endforeach
-                                </div>
-                        </div>
-                            <div class="text-right">
-                                <button onclick="showConflictDetails('{{ $conflict['date'] }}')" 
-                                        class="text-red-600 hover:text-red-900 text-sm">
-                                    Detail
-                                </button>
-                        </div>
-                        </div>
-                    @endforeach
-                        </div>
-            @else
-                <p class="text-gray-500 text-center py-4">Tidak ada konflik terdeteksi</p>
-            @endif
-                        </div>
-                        </div>
-                        </div>
 
 <!-- Event Detail Modal -->
 <div id="eventDetailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
@@ -446,26 +378,7 @@
                         </div>
                         </div>
 
-<!-- Conflict Alert -->
-@if($stats['conflicts'] > 0)
-    <div class="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
-        <div class="flex">
-            <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                </svg>
-                        </div>
-            <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-800">
-                    {{ $stats['conflicts'] }} konflik jadwal terdeteksi
-                </h3>
-                <p class="mt-1 text-sm text-red-700">
-                    Terdapat peminjaman yang berpotensi konflik jadwal. Segera koordinasi untuk menghindari bentrokan.
-                </p>
-                        </div>
-                        </div>
-                        </div>
-@endif
+
 @endsection
 
 @push('styles')

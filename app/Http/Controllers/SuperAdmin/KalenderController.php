@@ -31,13 +31,7 @@ class KalenderController extends Controller
         // Get calendar statistics
         $stats = $this->getCalendarStats($adminId, $month, $year);
         
-        // Get upcoming events
-        $upcomingEvents = $this->getUpcomingEvents($adminId);
-        
-        // Get conflicts
-        $conflicts = $this->getConflicts($adminId, $month, $year);
-        
-        return view('superadmin.kalender', compact('admins', 'stats', 'upcomingEvents', 'conflicts', 'month', 'year'));
+        return view('superadmin.kalender', compact('admins', 'stats', 'month', 'year'));
     }
     
     /**

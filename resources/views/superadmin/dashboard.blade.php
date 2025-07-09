@@ -13,7 +13,7 @@
 </nav>
 
 <!-- Page Header -->
-<div class="flex justify-between items-center mb-8">
+<div class="flex justify-between items-center mb-6">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Dashboard Super Admin</h1>
         <p class="text-gray-600">Ringkasan aktivitas sistem SIMBARA</p>
@@ -29,7 +29,7 @@
 </div>
 
 <!-- Main Statistics Cards -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
     <!-- Total Peminjaman Period -->
     <div class="bg-white rounded-lg shadow-sm p-6">
         <div class="flex items-center">
@@ -86,7 +86,7 @@
 </div>
 
 <!-- Secondary Statistics -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
     <!-- Total Pengajuan Pendaftaran -->
     <div class="bg-white rounded-lg shadow-sm p-4">
         <div class="flex items-center">
@@ -149,9 +149,9 @@
 </div>
 
 <!-- Feature Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
     <!-- Verifikasi Pendaftaran -->
-    <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow">
         <div class="flex items-center mb-4">
             <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +159,7 @@
                 </svg>
             </div>
             <div class="ml-3">
-                <h3 class="text-lg font-medium text-gray-900">Verifikasi Pendaftaran</h3>
+                <h3 class="text-base font-medium text-gray-900">Verifikasi Pendaftaran</h3>
                 <p class="text-sm text-gray-500">Kelola pengajuan pendaftaran akun</p>
             </div>
         </div>
@@ -172,7 +172,7 @@
     </div>
 
     <!-- Inventaris Global -->
-    <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow">
         <div class="flex items-center mb-4">
             <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,7 +180,7 @@
                 </svg>
             </div>
             <div class="ml-3">
-                <h3 class="text-lg font-medium text-gray-900">Inventaris Global</h3>
+                <h3 class="text-base font-medium text-gray-900">Inventaris Global</h3>
                 <p class="text-sm text-gray-500">Monitor semua barang inventaris</p>
             </div>
         </div>
@@ -193,7 +193,7 @@
     </div>
 
     <!-- Peminjaman Global -->
-    <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow">
         <div class="flex items-center mb-4">
             <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +201,7 @@
                 </svg>
             </div>
             <div class="ml-3">
-                <h3 class="text-lg font-medium text-gray-900">Peminjaman Global</h3>
+                <h3 class="text-base font-medium text-gray-900">Peminjaman Global</h3>
                 <p class="text-sm text-gray-500">Monitor semua peminjaman</p>
             </div>
         </div>
@@ -214,7 +214,7 @@
     </div>
 
     <!-- Transaksi & Pembayaran -->
-    <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow">
         <div class="flex items-center mb-4">
             <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +222,7 @@
                 </svg>
             </div>
             <div class="ml-3">
-                <h3 class="text-lg font-medium text-gray-900">Transaksi</h3>
+                <h3 class="text-base font-medium text-gray-900">Transaksi</h3>
                 <p class="text-sm text-gray-500">Verifikasi pembayaran</p>
             </div>
         </div>
@@ -235,7 +235,7 @@
     </div>
 
     <!-- Pengembalian -->
-    <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow">
         <div class="flex items-center mb-4">
             <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -243,7 +243,7 @@
                 </svg>
             </div>
             <div class="ml-3">
-                <h3 class="text-lg font-medium text-gray-900">Pengembalian</h3>
+                <h3 class="text-base font-medium text-gray-900">Pengembalian</h3>
                 <p class="text-sm text-gray-500">Proses pengembalian barang</p>
             </div>
         </div>
@@ -256,7 +256,7 @@
     </div>
 
     <!-- Kalender Global -->
-    <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+    <div class="bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow">
         <div class="flex items-center mb-4">
             <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,7 +264,7 @@
                 </svg>
             </div>
             <div class="ml-3">
-                <h3 class="text-lg font-medium text-gray-900">Kalender Global</h3>
+                <h3 class="text-base font-medium text-gray-900">Kalender Global</h3>
                 <p class="text-sm text-gray-500">Jadwal peminjaman semua lembaga</p>
             </div>
         </div>
@@ -277,75 +277,7 @@
     </div>
 </div>
 
-<!-- Recent Activities -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Recent Peminjaman -->
-    <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Peminjaman Terbaru</h3>
-        </div>
-        <div class="p-6">
-            @if($recentPeminjaman->count() > 0)
-                <div class="space-y-4">
-                    @foreach($recentPeminjaman as $peminjaman)
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-medium text-gray-900">{{ $peminjaman->kode_peminjaman }}</p>
-                                <p class="text-sm text-gray-500">{{ $peminjaman->user->nama_penanggung_jawab ?? 'User' }}</p>
-                                <p class="text-xs text-gray-400">{{ $peminjaman->created_at->diffForHumans() }}</p>
-                            </div>
-                            <div class="text-right">
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                                    @if($peminjaman->status_pengajuan === 'pending_approval') bg-yellow-100 text-yellow-800
-                                    @elseif($peminjaman->status_pengajuan === 'approved') bg-green-100 text-green-800
-                                    @elseif($peminjaman->status_pengajuan === 'confirmed') bg-blue-100 text-blue-800
-                                    @else bg-gray-100 text-gray-800 @endif">
-                                    {{ ucfirst($peminjaman->status_pengajuan) }}
-                                </span>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <p class="text-gray-500 text-center py-4">Belum ada peminjaman terbaru</p>
-            @endif
-        </div>
-    </div>
 
-    <!-- Recent Pengembalian -->
-    <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Pengembalian Terbaru</h3>
-        </div>
-        <div class="p-6">
-            @if($recentPengembalian->count() > 0)
-                <div class="space-y-4">
-                    @foreach($recentPengembalian as $pengembalian)
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="font-medium text-gray-900">{{ $pengembalian->peminjaman->kode_peminjaman }}</p>
-                                <p class="text-sm text-gray-500">{{ $pengembalian->peminjaman->user->nama_penanggung_jawab ?? 'User' }}</p>
-                                <p class="text-xs text-gray-400">{{ $pengembalian->created_at->diffForHumans() }}</p>
-                            </div>
-                            <div class="text-right">
-                                @if($pengembalian->total_denda > 0)
-                                    <p class="text-sm font-medium text-red-600">Denda: Rp {{ number_format($pengembalian->total_denda, 0, ',', '.') }}</p>
-                                @else
-                                    <p class="text-sm text-green-600">Tanpa Denda</p>
-                                @endif
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                                    {{ ucfirst($pengembalian->status_pengembalian) }}
-                                </span>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @else
-                <p class="text-gray-500 text-center py-4">Belum ada pengembalian terbaru</p>
-            @endif
-        </div>
-    </div>
-</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

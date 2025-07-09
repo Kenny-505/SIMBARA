@@ -38,8 +38,8 @@
             }
         </style>
     </head>
-    <body class="font-sans antialiased bg-gray-100 min-h-screen w-full overflow-x-hidden">
-        <div class="flex min-h-screen w-full">
+    <body class="font-sans antialiased bg-gray-100 h-screen w-full overflow-hidden">
+        <div class="flex h-screen w-full">
             <!-- Fixed Sidebar -->
             <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg">
                 <!-- Sidebar Header -->
@@ -125,9 +125,9 @@
             </div>
 
             <!-- Main Content Area -->
-            <div class="ml-64 content-container">
+            <div class="ml-64 content-container flex flex-col h-screen">
                 <!-- Fixed Header -->
-                <header class="bg-white shadow-sm border-b border-gray-200 h-16 sticky top-0 z-40 w-full">
+                <header class="bg-white shadow-sm border-b border-gray-200 h-16 flex-shrink-0 w-full">
                     <div class="flex items-center justify-between px-6 h-full">
                         <!-- Search Bar -->
                         <div class="flex-1 max-w-lg">
@@ -186,9 +186,9 @@
                     </div>
                 </header>
 
-                <!-- Scrollable Content -->
-                <main class="bg-gray-50 min-h-screen w-full">
-                    <div class="p-6 max-w-full">
+                <!-- Fixed Content Area -->
+                <main class="bg-gray-50 flex-1 w-full overflow-hidden">
+                    <div class="p-4 h-full overflow-y-auto max-w-full">
                         <!-- Flash Messages -->
                         @if (session('success'))
                             <div class="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg relative" role="alert" x-data="{ show: true }" x-show="show" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100">

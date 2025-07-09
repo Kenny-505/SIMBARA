@@ -125,19 +125,24 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500">Nama Lembaga</label>
-                        <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nama_lembaga }}</p>
+                        <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nama_lembaga ?? 'N/A' }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Penanggung Jawab</label>
-                        <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nama_penanggung_jawab }}</p>
+                        <label class="block text-sm font-medium text-gray-500">Nama Pengambil</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->nama_pengambil ?? '-' }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Email</label>
-                        <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->email }}</p>
+                        <label class="block text-sm font-medium text-gray-500">Nomor Identitas Pengambil</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->no_identitas_pengambil ?? '-' }}</p>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-500">Nomor Telepon</label>
-                        <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nomor_telepon ?? '-' }}</p>
+                        <label class="block text-sm font-medium text-gray-500">Nomor HP Pengambil</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->no_hp_pengambil ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-500">Penanggung Jawab Akun</label>
+                        <p class="mt-1 text-sm text-gray-900">{{ $peminjaman->user->nama_penanggung_jawab ?? 'N/A' }}</p>
+                        <p class="mt-1 text-xs text-gray-500">{{ $peminjaman->user->email ?? '-' }}</p>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-500">Tipe User</label>
@@ -305,20 +310,19 @@
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    @if($item->barang->foto_barang)
-                                        <img class="h-10 w-10 rounded-full object-cover mr-3" 
-                                             src="{{ asset('images/barang/' . $item->barang->foto_barang) }}" 
+                                    @if($item->barang->foto_1)
+                                        <img class="h-10 w-10 rounded-lg object-cover mr-3" 
+                                             src="data:image/jpeg;base64,{{ base64_encode($item->barang->foto_1) }}" 
                                              alt="{{ $item->barang->nama_barang }}">
                                     @else
-                                        <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                                        <div class="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center mr-3">
                                             <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                             </svg>
                                         </div>
                                     @endif
                                     <div>
                                         <div class="text-sm font-medium text-gray-900">{{ $item->barang->nama_barang }}</div>
-                                        <div class="text-sm text-gray-500">{{ $item->barang->deskripsi_barang }}</div>
                                     </div>
                                 </div>
                             </td>
@@ -327,7 +331,7 @@
                                 <div class="text-sm text-gray-500">{{ $item->barang->admin->nama_lengkap ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $item->kuantitas }}
+                                {{ $item->jumlah_pinjam }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @if($item->status_persetujuan == 'approved')

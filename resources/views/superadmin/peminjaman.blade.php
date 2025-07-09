@@ -284,47 +284,7 @@
     @endif
 </div>
 
-<!-- Recent Activities -->
-<div class="mt-8 bg-white rounded-lg shadow-sm">
-    <div class="px-6 py-4 border-b border-gray-200">
-        <h3 class="text-lg font-medium text-gray-900">Aktivitas Terbaru</h3>
-    </div>
-    <div class="p-6">
-        @if($recentActivities->count() > 0)
-            <div class="space-y-4">
-                @foreach($recentActivities as $activity)
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-3">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-900">{{ $activity->kode_peminjaman }}</p>
-                                <p class="text-sm text-gray-500">{{ $activity->user->nama_penanggung_jawab ?? 'User' }}</p>
-                                <p class="text-xs text-gray-400">{{ $activity->updated_at->diffForHumans() }}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full 
-                                @if($activity->status_pengajuan === 'pending_approval') bg-yellow-100 text-yellow-800
-                                @elseif($activity->status_pengajuan === 'approved') bg-green-100 text-green-800
-                                @elseif($activity->status_pengajuan === 'confirmed') bg-blue-100 text-blue-800
-                                @else bg-gray-100 text-gray-800 @endif">
-                                {{ ucfirst($activity->status_pengajuan) }}
-                            </span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @else
-            <p class="text-gray-500 text-center py-4">Belum ada aktivitas terbaru</p>
-        @endif
-    </div>
-</div>
+
 
 <!-- Overdue Alert -->
 @if($stats['overdue'] > 0)

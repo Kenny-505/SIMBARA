@@ -103,11 +103,7 @@ class InventarisController extends Controller
     {
         $barang = Barang::with(['admin'])->findOrFail($id);
         
-        // Get borrowing history for this item
-        $borrowingHistory = PeminjamanBarang::with(['peminjaman.user', 'approvedBy'])
-            ->where('id_barang', $id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+
         
         // Get current borrowings (ongoing loans)
         $currentBorrowings = PeminjamanBarang::with(['peminjaman.user'])
@@ -125,7 +121,6 @@ class InventarisController extends Controller
         
         return view('superadmin.inventaris.show', compact(
             'barang',
-            'borrowingHistory',
             'currentBorrowings',
             'totalBorrowed',
             'utilizationRate'

@@ -180,12 +180,6 @@
                         Status
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Utilisasi
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Terakhir Dipinjam
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Aksi
                     </th>
                                 </tr>
@@ -237,31 +231,19 @@
                                 </span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">{{ $barang->total_peminjaman ?? 0 }}x</div>
-                            <div class="text-sm text-gray-500">dipinjam</div>
-                                    </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            @if($barang->terakhir_dipinjam)
-                                <div class="text-sm text-gray-900">{{ $barang->terakhir_dipinjam->format('d/m/Y') }}</div>
-                                <div class="text-sm text-gray-500">{{ $barang->terakhir_dipinjam->diffForHumans() }}</div>
-                            @else
-                                <span class="text-sm text-gray-500">Belum pernah</span>
-                            @endif
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <a href="{{ route('superadmin.inventaris.show', $barang->id_barang) }}" 
                                class="text-blue-600 hover:text-blue-900">
                                 Detail
                             </a>
-                                    </td>
+                        </td>
                                 </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
                             Tidak ada barang yang ditemukan
-                                    </td>
-                                </tr>
+                        </td>
+                    </tr>
                 @endforelse
                             </tbody>
                         </table>

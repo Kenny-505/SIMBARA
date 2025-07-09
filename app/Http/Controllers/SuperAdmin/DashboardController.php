@@ -44,16 +44,7 @@ class DashboardController extends Controller
         // Pending approvals count (peminjaman waiting for admin approval)
         $pendingApprovals = Peminjaman::where('status_pengajuan', 'pending_approval')->count();
         
-        // Recent activities for dashboard
-        $recentPeminjaman = Peminjaman::with(['user', 'peminjamanBarangs.barang.admin'])
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
-            
-        $recentPengembalian = Pengembalian::with(['peminjaman.user'])
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+
         
         // Monthly trends for charts
         $monthlyData = $this->getMonthlyTrends();
@@ -65,8 +56,6 @@ class DashboardController extends Controller
             'totalPeminjamanPeriod',
             'revenueNonCivitas',
             'pendingApprovals',
-            'recentPeminjaman',
-            'recentPengembalian',
             'monthlyData',
             'period'
         ));

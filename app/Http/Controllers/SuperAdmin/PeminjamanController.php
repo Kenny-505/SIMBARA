@@ -92,17 +92,10 @@ class PeminjamanController extends Controller
                 ->where('tanggal_selesai', '<', now())->count()
         ];
         
-        // Get recent activities
-        $recentActivities = Peminjaman::with(['user', 'peminjamanBarangs.barang.admin'])
-            ->orderBy('updated_at', 'desc')
-            ->limit(5)
-            ->get();
-        
         return view('superadmin.peminjaman', compact(
             'peminjaman',
             'admins',
-            'stats',
-            'recentActivities'
+            'stats'
         ));
     }
     

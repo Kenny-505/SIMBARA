@@ -243,7 +243,6 @@ Route::prefix('superadmin')->name('superadmin.')->middleware('superadmin')->grou
         Route::post('/store', [\App\Http\Controllers\SuperAdmin\KalenderController::class, 'store'])->name('store');
         Route::get('/item/{itemId}/availability', [\App\Http\Controllers\SuperAdmin\KalenderController::class, 'getItemAvailability'])->name('item-availability');
         Route::get('/trends/monthly', [\App\Http\Controllers\SuperAdmin\KalenderController::class, 'getMonthlyTrends'])->name('monthly-trends');
-        Route::get('/export', [\App\Http\Controllers\SuperAdmin\KalenderController::class, 'export'])->name('export');
         Route::post('/check-conflicts', [\App\Http\Controllers\SuperAdmin\KalenderController::class, 'checkConflicts'])->name('check-conflicts');
     });
 });

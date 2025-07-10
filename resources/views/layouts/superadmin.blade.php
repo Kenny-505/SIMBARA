@@ -171,7 +171,7 @@
                                      x-transition:leave-start="transform opacity-100 scale-100"
                                      x-transition:leave-end="transform opacity-0 scale-95"
                                      class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                                    <form method="POST" action="{{ route('logout') }}">
+                                    <form method="POST" action="{{ route('logout') }}" onsubmit="clearBrowserCache()">
                                         @csrf
                                         <button type="submit" class="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,5 +267,22 @@
                 </main>
             </div>
         </div>
+        
+        <script>
+            function clearBrowserCache() {
+                // Clear local storage and session storage
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Clear any cached data
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) {
+                            caches.delete(name);
+                        }
+                    });
+                }
+            }
+        </script>
     </body>
 </html> 

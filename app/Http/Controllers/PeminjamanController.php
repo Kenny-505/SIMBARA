@@ -488,6 +488,14 @@ class PeminjamanController extends Controller
     }
 
     /**
+     * Process confirmed loan (reduce stock) - Public wrapper for external calls
+     */
+    public function processConfirmedLoanPublic($peminjaman)
+    {
+        return $this->processConfirmedLoan($peminjaman);
+    }
+
+    /**
      * Process confirmed loan (reduce stock)
      */
     private function processConfirmedLoan($peminjaman)
@@ -599,44 +607,59 @@ class PeminjamanController extends Controller
     {
         $user = Auth::guard('user')->user();
         
-        $peminjaman = Peminjaman::with('peminjamanBarangs.barang.admin')
+        $peminjaman = Peminjaman::with(['peminjamanBarangs.barang.admin'])
             ->where('id_peminjaman', $id)
             ->where('id_user', $user->id_user)
             ->whereIn('status_pengajuan', ['draft', 'partial'])
             ->firstOrFail();
 
-        // For partial status, separate approved and rejected items (exclude deleted items from user view)
+        // Always fetch available barangs for replacement/template consistency
+        $barangs = Barang::with('admin')
+            ->where('is_active', true)
+            ->where('stok_tersedia', '>', 0)
+            ->orderBy('nama_barang', 'asc')
+            ->get();
+
         if ($peminjaman->status_pengajuan === 'partial') {
-            $approvedItems = $peminjaman->peminjamanBarangs
-                ->where('status_persetujuan', 'approved')
-                ->whereNull('user_action'); // Only show items not deleted by user
-            $rejectedItems = $peminjaman->peminjamanBarangs
-                ->where('status_persetujuan', 'rejected')
-                ->whereNull('user_action'); // Only show items not deleted by user
+            // For partial status, only show rejected items for action
+            $approvedItems = $peminjaman->peminjamanBarangs->where('status_persetujuan', 'approved')
+                ->whereNull('user_action');
+                
+            $rejectedItems = $peminjaman->peminjamanBarangs->where('status_persetujuan', 'rejected')
+                ->whereNull('user_action'); 
             
-            // Get similar items for rejected items (based on first word of nama_barang)
+            // Find similar items for replacement options
             $similarItemsMap = [];
             foreach ($rejectedItems as $rejectedItem) {
-                $firstWord = explode(' ', $rejectedItem->barang->nama_barang)[0];
-                $similarItems = Barang::with('admin')
-                    ->where('is_active', true)
+                $words = explode(' ', $rejectedItem->barang->nama_barang);
+                
+                $searchWords = array_filter($words, function($word) {
+                    return strlen($word) > 3;
+                });
+
+                if (empty($searchWords)) {
+                    $searchWords = $words;
+                }
+                
+                $similarItemsMap[$rejectedItem->id_peminjaman_barang] = Barang::where('is_active', true)
                     ->where('stok_tersedia', '>', 0)
-                    ->where('nama_barang', 'LIKE', $firstWord . '%')
-                    ->where('id_barang', '!=', $rejectedItem->id_barang) // Exclude rejected item itself
-                    ->orderBy('nama_barang', 'asc')
+                    ->where('id_barang', '!=', $rejectedItem->id_barang)
+                    ->where(function ($query) use ($searchWords) {
+                        foreach ($searchWords as $word) {
+                            $query->orWhere('nama_barang', 'LIKE', '%' . $word . '%');
+                        }
+                    })
+                    ->with('admin')
+                    ->orderBy('nama_barang')
+                    ->limit(10)
                     ->get();
-                $similarItemsMap[$rejectedItem->id_peminjaman_barang] = $similarItems;
             }
             
-            return view('user.pengajuan-edit', compact('peminjaman', 'approvedItems', 'rejectedItems', 'similarItemsMap'));
+            return view('user.pengajuan-edit', compact(
+                'peminjaman', 'approvedItems', 'rejectedItems', 'similarItemsMap', 'barangs'
+            ));
         } else {
             // For draft status, show all available items
-            $barangs = Barang::with('admin')
-                ->where('is_active', true)
-                ->where('stok_tersedia', '>', 0)
-                ->orderBy('nama_barang', 'asc')
-                ->get();
-                
             return view('user.pengajuan-edit', compact('peminjaman', 'barangs'));
         }
     }
@@ -857,6 +880,9 @@ class PeminjamanController extends Controller
             $newTotalBiaya = $peminjaman->total_biaya + $totalBiayaChange;
             $peminjaman->update(['total_biaya' => $newTotalBiaya]);
 
+            // REFRESH the relationship to get the most up-to-date item statuses
+            $peminjaman->load('peminjamanBarangs');
+
             // Check remaining active items (not deleted by user) and update status accordingly
             $remainingItems = $peminjaman->peminjamanBarangs()->whereNull('user_action')->get();
             $hasPendingItems = $remainingItems->where('status_persetujuan', 'pending')->count() > 0;
@@ -866,12 +892,18 @@ class PeminjamanController extends Controller
             if ($hasPendingItems) {
                 // There are new pending items, set to pending_approval
                 $peminjaman->update(['status_pengajuan' => 'pending_approval']);
+            } elseif ($hasApprovedItems && $hasRejectedItems) {
+                // If there are still both approved and other rejected items
+                $peminjaman->update(['status_pengajuan' => 'partial']);
             } elseif ($hasApprovedItems && !$hasRejectedItems) {
-                // Only approved items left, set to approved
+                // Only approved items left, set to approved, allowing confirmation
                 $peminjaman->update(['status_pengajuan' => 'approved']);
             } elseif (!$hasApprovedItems && !$hasRejectedItems && !$hasPendingItems) {
                 // No items left, set back to draft
                 $peminjaman->update(['status_pengajuan' => 'draft']);
+            } else {
+                // Default fallback to keep it partial if other conditions aren't met
+                $peminjaman->update(['status_pengajuan' => 'partial']);
             }
 
             \Log::info('updatePartialPeminjaman completed successfully', [

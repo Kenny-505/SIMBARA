@@ -113,7 +113,7 @@
 
                         <!-- Logout -->
                         <div class="mt-8 pt-4 border-t border-gray-200">
-                            <form method="POST" action="{{ route('logout') }}">
+                            <form method="POST" action="{{ route('logout') }}" onsubmit="clearBrowserCache()">
                                 @csrf
                                 <button type="submit" class="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors duration-200">
                                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,6 +300,21 @@
         document.addEventListener('DOMContentLoaded', function() {
             updateSidebarCartCount();
         });
+
+        function clearBrowserCache() {
+            // Clear local storage and session storage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Clear any cached data
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+        }
     </script>
     </body>
 </html> 

@@ -36,11 +36,21 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Clear all session data including cart before logout
+        $request->session()->forget('cart');
+        $request->session()->flush();
+        
         Auth::guard('web')->logout();
 
+        // Clear all cache
+        \Illuminate\Support\Facades\Cache::flush();
+        
+        // Invalidate and regenerate session
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
+        
+        // Clear any remember tokens by setting a new session
+        $request->session()->migrate(true);
 
         return redirect('/');
     }

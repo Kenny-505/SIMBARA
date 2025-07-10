@@ -48,10 +48,10 @@
                 @enderror
             </div>
 
-            <!-- Stok -->
+            <!-- Stok Total -->
             <div>
                 <label for="stok_total" class="block text-sm font-medium text-gray-700 mb-2">
-                    Stok <span class="text-red-500">*</span>
+                    Stok Total <span class="text-red-500">*</span>
                 </label>
                 <input type="number" id="stok_total" name="stok_total" value="{{ old('stok_total', $barang->stok_total) }}" min="0"
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('stok_total') border-red-500 @enderror"
@@ -59,6 +59,20 @@
                 @error('stok_total')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
+            </div>
+
+            <!-- Stok Tersedia -->
+            <div>
+                <label for="stok_tersedia" class="block text-sm font-medium text-gray-700 mb-2">
+                    Stok Tersedia <span class="text-red-500">*</span>
+                </label>
+                <input type="number" id="stok_tersedia" name="stok_tersedia" value="{{ old('stok_tersedia', $barang->stok_tersedia) }}" min="0"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('stok_tersedia') border-red-500 @enderror"
+                       required>
+                @error('stok_tersedia')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-1 text-xs text-gray-500">Stok tersedia tidak boleh melebihi stok total.</p>
             </div>
 
             <!-- Harga Sewa -->
@@ -106,51 +120,51 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Gambar 1 -->
                 <div>
-                    <label for="foto_1" class="block text-sm font-medium text-gray-700 mb-2">Gambar 1</label>
+                    <label for="gambar_1" class="block text-sm font-medium text-gray-700 mb-2">Gambar 1</label>
                     @if($barang->foto_1)
                         <div class="mb-3">
                             <img src="data:image/jpeg;base64,{{ base64_encode($barang->foto_1) }}" 
                                  alt="Foto 1" class="w-full h-32 object-cover rounded-lg border">
                         </div>
                     @endif
-                    <input type="file" id="foto_1" name="foto_1" accept="image/*"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('foto_1') border-red-500 @enderror">
+                    <input type="file" id="gambar_1" name="gambar_1" accept="image/*"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('gambar_1') border-red-500 @enderror">
                     <p class="mt-1 text-xs text-gray-500">Max 2MB, format: JPEG, PNG, JPG</p>
-                    @error('foto_1')
+                    @error('gambar_1')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Gambar 2 -->
                 <div>
-                    <label for="foto_2" class="block text-sm font-medium text-gray-700 mb-2">Gambar 2</label>
+                    <label for="gambar_2" class="block text-sm font-medium text-gray-700 mb-2">Gambar 2</label>
                     @if($barang->foto_2)
                         <div class="mb-3">
                             <img src="data:image/jpeg;base64,{{ base64_encode($barang->foto_2) }}" 
                                  alt="Foto 2" class="w-full h-32 object-cover rounded-lg border">
                         </div>
                     @endif
-                    <input type="file" id="foto_2" name="foto_2" accept="image/*"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('foto_2') border-red-500 @enderror">
+                    <input type="file" id="gambar_2" name="gambar_2" accept="image/*"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('gambar_2') border-red-500 @enderror">
                     <p class="mt-1 text-xs text-gray-500">Max 2MB, format: JPEG, PNG, JPG</p>
-                    @error('foto_2')
+                    @error('gambar_2')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Gambar 3 -->
                 <div>
-                    <label for="foto_3" class="block text-sm font-medium text-gray-700 mb-2">Gambar 3</label>
+                    <label for="gambar_3" class="block text-sm font-medium text-gray-700 mb-2">Gambar 3</label>
                     @if($barang->foto_3)
                         <div class="mb-3">
                             <img src="data:image/jpeg;base64,{{ base64_encode($barang->foto_3) }}" 
                                  alt="Foto 3" class="w-full h-32 object-cover rounded-lg border">
                         </div>
                     @endif
-                    <input type="file" id="foto_3" name="foto_3" accept="image/*"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('foto_3') border-red-500 @enderror">
+                    <input type="file" id="gambar_3" name="gambar_3" accept="image/*"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('gambar_3') border-red-500 @enderror">
                     <p class="mt-1 text-xs text-gray-500">Max 2MB, format: JPEG, PNG, JPG</p>
-                    @error('foto_3')
+                    @error('gambar_3')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

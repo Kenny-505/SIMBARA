@@ -23,7 +23,18 @@ class AdminMiddleware
         // Check if the authenticated admin is active
         $admin = auth()->guard('admin')->user();
         if (!$admin || !$admin->is_active) {
+            // Clear session data when admin is inactive
+            $request->session()->forget('cart');
+            $request->session()->flush();
+            
             auth()->guard('admin')->logout();
+            
+            // Clear cache
+            \Illuminate\Support\Facades\Cache::flush();
+            
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
             return redirect()->route('login')->with('error', 'Akun admin tidak aktif.');
         }
 

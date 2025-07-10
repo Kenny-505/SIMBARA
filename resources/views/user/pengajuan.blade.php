@@ -36,8 +36,10 @@
                     // Determine the primary status to display
                     $primaryStatus = $peminjaman->status_pengajuan;
                     
-                    // If loan is ongoing, returned, or completed, show status_peminjaman
-                    if (in_array($peminjaman->status_peminjaman, ['ongoing', 'returned', 'completed'])) {
+                    // Only show status_peminjaman if the loan is actually confirmed and active
+                    // This prevents showing "ongoing" for items that are still pending approval
+                    if ($peminjaman->status_pengajuan === 'confirmed' && 
+                        in_array($peminjaman->status_peminjaman, ['ongoing', 'returned', 'completed'])) {
                         $primaryStatus = $peminjaman->status_peminjaman;
                     }
                     
@@ -158,6 +160,17 @@
             @elseif($peminjaman->status_pengajuan === 'pending_approval')
                 <!-- Pending approval -->
                 <span class="text-sm text-gray-500">Menunggu review admin</span>
+
+            @elseif($peminjaman->status_pengajuan === 'partial')
+                <!-- PARTIAL: User must edit -->
+                <a href="{{ route('user.pengajuan.edit', $peminjaman->id_peminjaman) }}" 
+                   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                    Edit Pengajuan
+                </a>
+                <a href="{{ route('user.pengajuan.show', $peminjaman->id_peminjaman) }}" 
+                   class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                    Lihat Detail
+                </a>
 
             @elseif($peminjaman->status_pengajuan === 'approved')
                 <!-- Approved - can confirm -->

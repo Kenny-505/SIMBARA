@@ -423,6 +423,105 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Remove item functionality for draft mode
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-item-btn')) {
+        if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
+            e.target.closest('.item-row').remove();
+            checkEmptyState();
+            reindexItems();
+        }
+    }
+});
+
+// Function to check if items container is empty
+function checkEmptyState() {
+    const container = document.getElementById('itemsContainer');
+    const itemRows = container.querySelectorAll('.item-row');
+    
+    if (itemRows.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <p>Belum ada barang dipilih. Klik "Tambah Barang" untuk memilih barang.</p>
+            </div>
+        `;
+    }
+}
+
+// Function to reindex item names after deletion
+function reindexItems() {
+    const itemRows = document.querySelectorAll('.item-row');
+    itemRows.forEach((row, index) => {
+        // Update select name
+        const select = row.querySelector('select[name*="[id_barang]"]');
+        if (select) {
+            select.name = `items[${index}][id_barang]`;
+        }
+        
+        // Update input name
+        const input = row.querySelector('input[name*="[jumlah]"]');
+        if (input) {
+            input.name = `items[${index}][jumlah]`;
+        }
+    });
+}
+
+// Add item functionality for draft mode
+document.addEventListener('DOMContentLoaded', function() {
+    const addItemBtn = document.getElementById('addItemBtn');
+    if (addItemBtn) {
+        addItemBtn.addEventListener('click', function() {
+            addNewItemRow();
+        });
+    }
+});
+
+function addNewItemRow() {
+    const container = document.getElementById('itemsContainer');
+    
+    // Remove empty state if exists
+    const emptyState = container.querySelector('.text-center');
+    if (emptyState) {
+        emptyState.remove();
+    }
+    
+    // Get current item count for proper indexing
+    const currentItems = container.querySelectorAll('.item-row');
+    const itemIndex = currentItems.length;
+    
+    const itemRow = document.createElement('div');
+    itemRow.className = 'item-row border border-gray-200 rounded-lg p-4 mb-4';
+    itemRow.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Barang</label>
+                <select name="items[${itemIndex}][id_barang]" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">-- Pilih Barang --</option>
+                    @foreach($barangs as $barang)
+                        <option value="{{ $barang->id_barang }}">
+                            {{ $barang->nama_barang }} - {{ $barang->admin->nama_lembaga }} ({{ $barang->stok_tersedia }} tersedia)
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah</label>
+                <input type="number" name="items[${itemIndex}][jumlah]" min="1" value="1" required
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            
+            <div class="flex items-end">
+                <button type="button" class="remove-item-btn bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-600 transition-colors">
+                    Hapus
+                </button>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(itemRow);
+}
 </script>
 
 @endsection 

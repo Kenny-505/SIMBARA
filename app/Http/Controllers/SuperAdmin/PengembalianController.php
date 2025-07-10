@@ -217,12 +217,10 @@ class PengembalianController extends Controller
                 $pengembalian->update(['status_pengembalian' => 'completed']);
                 $peminjaman->update(['status_peminjaman' => 'returned']);
                 
-                // Return stock to inventory for all items
-                foreach ($itemsToReturn as $item) {
-                    $item['barang']->increment('stok_tersedia', $item['jumlah']);
-                }
+                // Return stock based on condition
+                $this->updateStockAfterReturn($pengembalian);
                 
-                $message = "Pengembalian berhasil diproses tanpa denda. Peminjaman telah selesai.";
+                $message = "Pengembalian berhasil diproses tanpa denda. Stok telah diperbarui sesuai kondisi barang.";
             } else {
                 // Has penalty - wait for user payment, don't return stock yet
                 $pengembalian->update(['status_pengembalian' => 'payment_required']);
@@ -461,12 +459,10 @@ class PengembalianController extends Controller
                 $pengembalian->update(['status_pengembalian' => 'completed']);
                 $peminjaman->update(['status_peminjaman' => 'returned']);
                 
-                // Return stock to inventory for all items
-                foreach ($itemsToReturn as $item) {
-                    $item['barang']->increment('stok_tersedia', $item['jumlah']);
-                }
+                // Return stock based on condition
+                $this->updateStockAfterReturn($pengembalian);
                 
-                $message = "Pengembalian berhasil diproses tanpa denda. Peminjaman telah selesai.";
+                $message = "Pengembalian berhasil diproses tanpa denda. Stok telah diperbarui sesuai kondisi barang.";
             } else {
                 // Has penalty - wait for user payment, don't return stock yet
                 $pengembalian->update(['status_pengembalian' => 'payment_required']);
@@ -623,12 +619,10 @@ class PengembalianController extends Controller
                 $pengembalian->update(['status_pengembalian' => 'completed']);
                 $peminjaman->update(['status_peminjaman' => 'returned']);
                 
-                // Return stock to inventory for all items
-                foreach ($itemsToReturn as $item) {
-                    $item['barang']->increment('stok_tersedia', $item['jumlah']);
-                }
+                // Return stock to inventory based on condition
+                $this->updateStockAfterReturn($pengembalian);
                 
-                $message = "Pengembalian berhasil diproses tanpa denda. Peminjaman telah selesai.";
+                $message = "Pengembalian berhasil diproses tanpa denda. Stok telah diperbarui sesuai kondisi barang.";
             } else {
                 // Has penalty - wait for user payment, don't return stock yet
                 $pengembalian->update(['status_pengembalian' => 'payment_required']);
@@ -692,7 +686,7 @@ class PengembalianController extends Controller
 
         DB::beginTransaction();
         try {
-            $pengembalian = Pengembalian::with(['peminjaman.peminjamanBarangs.barang'])
+            $pengembalian = Pengembalian::with(['peminjaman', 'pengembalianBarangs.barang'])
                 ->where('status_pengembalian', 'payment_uploaded')
                 ->where('status_pembayaran_denda', 'uploaded')
                 ->findOrFail($id);
@@ -713,13 +707,10 @@ class PengembalianController extends Controller
                 // Update peminjaman status
                 $peminjaman->update(['status_peminjaman' => 'returned']);
 
-                // Return stock to inventory for all items
-                foreach ($pengembalian->pengembalianBarangs as $pengembalianBarang) {
-                    $barang = $pengembalianBarang->barang;
-                    $barang->increment('stok_tersedia', $pengembalianBarang->jumlah_kembali);
-                }
+                // Return stock to inventory based on condition
+                $this->updateStockAfterReturn($pengembalian);
 
-                $message = "Pembayaran denda berhasil diverifikasi. Pengembalian telah selesai sepenuhnya dan stok dikembalikan ke inventaris.";
+                $message = "Pembayaran denda berhasil diverifikasi. Pengembalian telah selesai sepenuhnya dan stok diperbarui sesuai kondisi barang.";
                 
             } else {
                 // Payment rejected - ask user to reupload
@@ -747,7 +738,41 @@ class PengembalianController extends Controller
         }
     }
     
+    /**
+     * Updates stock based on the condition of returned items.
+     * Severely damaged items ('parah') are removed from total stock.
+     * Other items are returned to available stock.
+     */
+    private function updateStockAfterReturn(Pengembalian $pengembalian)
+    {
+        // Ensure relationships are loaded to be safe
+        $pengembalian->loadMissing('pengembalianBarangs.barang');
 
+        foreach ($pengembalian->pengembalianBarangs as $item) {
+            // Check if barang relationship is loaded
+            if (!$item->barang) continue;
+
+            $jumlahKembali = $item->jumlah_kembali;
+            $barang = $item->barang;
+
+            if ($item->kondisi_barang === 'parah') {
+                // Item is severely damaged/lost.
+                // Decrease total stock. Available stock is not affected as it was already decremented on loan.
+                $barang->decrement('stok_total', $jumlahKembali);
+
+                // Ensure available stock is not higher than total stock
+                if ($barang->stok_tersedia > $barang->stok_total) {
+                    $barang->stok_tersedia = $barang->stok_total;
+                    $barang->save();
+                }
+
+            } else {
+                // Item is returned in a usable condition.
+                // Return to available stock.
+                $barang->increment('stok_tersedia', $jumlahKembali);
+            }
+        }
+    }
     
     /**
      * Get return statistics for API/AJAX

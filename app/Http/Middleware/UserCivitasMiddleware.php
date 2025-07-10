@@ -23,7 +23,18 @@ class UserCivitasMiddleware
         // Check if the authenticated user is active
         $user = auth()->guard('user')->user();
         if (!$user || !$user->is_active) {
+            // Clear session data when user is inactive
+            $request->session()->forget('cart');
+            $request->session()->flush();
+            
             auth()->guard('user')->logout();
+            
+            // Clear cache
+            \Illuminate\Support\Facades\Cache::flush();
+            
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
             return redirect()->route('login')->with('error', 'Akun user tidak aktif.');
         }
 
@@ -34,7 +45,18 @@ class UserCivitasMiddleware
 
         // Check if account is not expired
         if ($user->tanggal_berakhir && $user->tanggal_berakhir < now()) {
+            // Clear session data when account expired
+            $request->session()->forget('cart');
+            $request->session()->flush();
+            
             auth()->guard('user')->logout();
+            
+            // Clear cache
+            \Illuminate\Support\Facades\Cache::flush();
+            
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
             return redirect()->route('login')->with('error', 'Akun Anda telah kedaluwarsa. Silakan daftar ulang.');
         }
 

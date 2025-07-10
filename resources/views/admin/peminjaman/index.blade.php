@@ -245,26 +245,6 @@
                                         </svg>
                                         Detail
                                             </a>
-
-                                    @if($item->status_pengajuan == 'pending_approval')
-                                        <!-- Quick Approve Button -->
-                                        <button onclick="showApproveModal('{{ $item->id_peminjaman }}', '{{ $item->kode_peminjaman }}')"
-                                                class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            Approve
-                                        </button>
-
-                                        <!-- Quick Reject Button -->
-                                        <button onclick="showRejectModal('{{ $item->id_peminjaman }}', '{{ $item->kode_peminjaman }}')"
-                                                class="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                            Reject
-                                        </button>
-                                            @endif
                                         </div>
                                     </td>
                                 </tr>

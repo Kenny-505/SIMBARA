@@ -149,12 +149,8 @@ class TransaksiController extends Controller
                             $peminjaman->update(['status_pengajuan' => 'confirmed']);
                         }
                         
-                        // Process confirmed loan (reduce stock and set to ongoing)
-                        foreach ($peminjaman->peminjamanBarangs as $item) {
-                            $item->barang->decrement('stok_tersedia', $item->jumlah_pinjam);
-                        }
-                        
-                        $peminjaman->update(['status_peminjaman' => 'ongoing']);
+                        // Process confirmed loan using PeminjamanController to avoid duplication
+                        app(\App\Http\Controllers\PeminjamanController::class)->processConfirmedLoanPublic($peminjaman);
                     }
                 } else {
                     // Handle denda payment - complete the return process

@@ -26,5 +26,22 @@
                 {{ $slot }}
             </div>
         </div>
+        
+        <script>
+            function clearBrowserCache() {
+                // Clear local storage and session storage
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Clear any cached data
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) {
+                            caches.delete(name);
+                        }
+                    });
+                }
+            }
+        </script>
     </body>
 </html>

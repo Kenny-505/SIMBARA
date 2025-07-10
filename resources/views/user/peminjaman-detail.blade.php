@@ -23,104 +23,79 @@
             </div>
             
             <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Status -->
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-2">Status Pengajuan</h4>
-                        @if($peminjaman->status_pengajuan == 'pending')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                Menunggu Persetujuan
-                            </span>
-                        @elseif($peminjaman->status_pengajuan == 'approved')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                Disetujui
-                            </span>
-                        @elseif($peminjaman->status_pengajuan == 'rejected')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
-                                Ditolak
-                            </span>
-                        @else
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                                Draft
-                            </span>
-                        @endif
-                    </div>
-
-                    <!-- Status Peminjaman -->
-                    @if($peminjaman->status_peminjaman)
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-2">Status Peminjaman</h4>
-                        @if($peminjaman->status_peminjaman == 'ongoing')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                Sedang Berlangsung
-                            </span>
-                        @elseif($peminjaman->status_peminjaman == 'completed')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                Selesai
-                            </span>
-                        @endif
-                    </div>
-                    @endif
-
-                    <!-- Status Pembayaran -->
-                    @if($peminjaman->total_biaya > 0)
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-2">Status Pembayaran</h4>
-                        @if($peminjaman->status_pembayaran == 'pending')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                Belum Bayar
-                            </span>
-                        @elseif($peminjaman->status_pembayaran == 'waiting_verification')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                                Menunggu Verifikasi
-                            </span>
-                        @elseif($peminjaman->status_pembayaran == 'verified')
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                Terverifikasi
-                            </span>
-                        @endif
-                    </div>
-                    @endif
-                </div>
-
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Informasi Peminjaman -->
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Informasi Peminjaman</h4>
-                        <dl class="space-y-2">
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Kolom Kiri -->
+                    <div class="lg:col-span-2 space-y-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Informasi Peminjam & Pengajuan</h4>
+                        <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                             <div>
-                                <dt class="text-sm text-gray-600">Tujuan</dt>
+                                <dt class="text-sm text-gray-600">Nama Lembaga</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ $peminjaman->user->nama_lembaga ?? 'N/A' }}</dd>
+                            </div>
+                             <div>
+                                <dt class="text-sm text-gray-600">Penanggung Jawab Akun</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ $peminjaman->user->nama_penanggung_jawab ?? 'N/A' }}</dd>
+                                <dd class="text-xs text-gray-500">{{ $peminjaman->user->email ?? '-' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm text-gray-600">Nama Pengambil</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ $peminjaman->nama_pengambil ?? '-' }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm text-gray-600">Nomor HP Pengambil</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ $peminjaman->no_hp_pengambil ?? '-' }}</dd>
+                            </div>
+                            <div class="md:col-span-2">
+                                <dt class="text-sm text-gray-600">Nomor Identitas Pengambil</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ $peminjaman->no_identitas_pengambil ?? '-' }}</dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <!-- Kolom Kanan -->
+                    <div class="space-y-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-3">Informasi Peminjaman</h4>
+                        <dl class="space-y-4">
+                             <div>
+                                <dt class="text-sm text-gray-600">Tujuan Peminjaman</dt>
                                 <dd class="text-sm font-medium text-gray-900">{{ $peminjaman->tujuan_peminjaman }}</dd>
                             </div>
                             <div>
-                                <dt class="text-sm text-gray-600">Tanggal Pinjam</dt>
-                                <dd class="text-sm font-medium text-gray-900">{{ Carbon\Carbon::parse($peminjaman->tanggal_mulai)->format('d/m/Y') }}</dd>
+                                <dt class="text-sm text-gray-600">Tanggal Pengajuan</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ $peminjaman->created_at->format('d/m/Y H:i') }}</dd>
                             </div>
                             <div>
-                                <dt class="text-sm text-gray-600">Tanggal Kembali</dt>
-                                <dd class="text-sm font-medium text-gray-900">{{ Carbon\Carbon::parse($peminjaman->tanggal_selesai)->format('d/m/Y') }}</dd>
+                                <dt class="text-sm text-gray-600">Periode Peminjaman</dt>
+                                <dd class="text-sm font-medium text-gray-900">{{ Carbon\Carbon::parse($peminjaman->tanggal_mulai)->format('d/m/Y') }} - {{ Carbon\Carbon::parse($peminjaman->tanggal_selesai)->format('d/m/Y') }}</dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm text-gray-600">Status Pengajuan</dt>
+                                <dd>
+                                     @if($peminjaman->status_pengajuan == 'pending' || $peminjaman->status_pengajuan == 'pending_approval')
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                            Menunggu Persetujuan
+                                        </span>
+                                    @elseif($peminjaman->status_pengajuan == 'approved')
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                            Disetujui
+                                        </span>
+                                    @elseif($peminjaman->status_pengajuan == 'rejected')
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                            Ditolak
+                                        </span>
+                                     @elseif($peminjaman->status_pengajuan == 'partial')
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
+                                            Sebagian Disetujui
+                                        </span>
+                                    @else
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            {{ ucfirst($peminjaman->status_pengajuan) }}
+                                        </span>
+                                    @endif
+                                </dd>
                             </div>
                         </dl>
                     </div>
-
-                    <!-- Informasi Biaya -->
-                    @if($peminjaman->total_biaya > 0)
-                    <div>
-                        <h4 class="text-sm font-medium text-gray-700 mb-3">Informasi Biaya</h4>
-                        <dl class="space-y-2">
-                            <div>
-                                <dt class="text-sm text-gray-600">Total Biaya</dt>
-                                <dd class="text-lg font-bold text-blue-600">Rp {{ number_format($peminjaman->total_biaya, 0, ',', '.') }}</dd>
-                            </div>
-                            @if($peminjaman->denda > 0)
-                            <div>
-                                <dt class="text-sm text-gray-600">Denda</dt>
-                                <dd class="text-lg font-bold text-red-600">Rp {{ number_format($peminjaman->denda, 0, ',', '.') }}</dd>
-                            </div>
-                            @endif
-                        </dl>
-                    </div>
-                    @endif
                 </div>
             </div>
         </div>
@@ -165,8 +140,13 @@
                                             {{ $item->barang->nama_barang }}
                                         </div>
                                         <div class="text-sm text-gray-500">
-                                            {{ $item->barang->admin->nama_admin ?? 'N/A' }}
+                                            {{ $item->barang->admin->nama_lembaga ?? 'N/A' }}
                                         </div>
+                                        @if($item->status_persetujuan == 'rejected' && $item->notes_admin)
+                                            <div class="mt-1 text-xs text-red-600">
+                                                <strong>Alasan Ditolak:</strong> {{ $item->notes_admin }}
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </td>
@@ -242,6 +222,21 @@
                 </table>
             </div>
         </div>
+
+        <!-- Edit Actions for Partial Approval -->
+        @if($peminjaman->status_pengajuan == 'partial')
+        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-6">
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">Tindakan Diperlukan</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    Beberapa item dalam pengajuan Anda ditolak. Anda dapat mengedit pengajuan untuk menghapus atau mengganti item yang ditolak.
+                </p>
+                <a href="{{ route('user.pengajuan.edit', $peminjaman->id_peminjaman) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                    Edit Pengajuan
+                </a>
+            </div>
+        </div>
+        @endif
 
         <!-- Actions -->
         @if($peminjaman->status_pengajuan == 'approved' && $peminjaman->status_pembayaran == 'pending' && $peminjaman->total_biaya > 0)

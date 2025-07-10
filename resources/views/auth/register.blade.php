@@ -104,7 +104,14 @@
 
                     <!-- Registration Form -->
                     <form class="space-y-4" action="{{ route('pendaftaran.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
+                        @csrf
+
+                        <!-- General Error Display -->
+                        @if ($errors->any())
+                            <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                                <span class="font-bold">Terjadi kesalahan!</span> Silakan periksa kembali data yang Anda masukkan.
+                            </div>
+                        @endif
 
                         <!-- Row 1: Name and ID -->
                         <div class="grid grid-cols-2 gap-3">
@@ -117,11 +124,15 @@
                                     name="nama_penanggung_jawab" 
                                     type="text" 
                                     required 
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('nama_penanggung_jawab') border-red-500 @enderror"
                                     placeholder="Nama lengkap"
+                                    value="{{ old('nama_penanggung_jawab') }}"
                                 >
+                                @error('nama_penanggung_jawab')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
-        <div>
+                            <div>
                                 <label for="identitas" class="block text-xs font-medium text-gray-700 mb-1">
                                     No Identitas (KTM/KTP)
                                 </label>
@@ -130,11 +141,15 @@
                                     name="no_identitas" 
                                     type="text" 
                                     required 
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('no_identitas') border-red-500 @enderror"
                                     placeholder="Nomor identitas"
+                                    value="{{ old('no_identitas') }}"
                                 >
+                                @error('no_identitas')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
-        </div>
+                        </div>
 
                         <!-- Row 2: Email and Phone -->
                         <div class="grid grid-cols-2 gap-3">
@@ -147,9 +162,13 @@
                                     name="email" 
                                     type="email" 
                                     required 
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('email') border-red-500 @enderror"
                                     placeholder="email@example.com"
+                                    value="{{ old('email') }}"
                                 >
+                                @error('email')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
                                 <label for="phone" class="block text-xs font-medium text-gray-700 mb-1">
@@ -160,25 +179,33 @@
                                     name="no_hp" 
                                     type="tel" 
                                     required 
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('no_hp') border-red-500 @enderror"
                                     placeholder="08xxxxxxxxxx"
+                                    value="{{ old('no_hp') }}"
                                 >
+                                @error('no_hp')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
-        </div>
+                        </div>
 
                         <!-- Activity Name -->
                         <div>
-                            <label for="kegiatan" class="block text-xs font-medium text-gray-700 mb-1">
+                            <label for="nama_kegiatan" class="block text-xs font-medium text-gray-700 mb-1">
                                 Nama Kegiatan
                             </label>
                             <input 
-                                id="kegiatan" 
-                                name="kegiatan" 
+                                id="nama_kegiatan" 
+                                name="nama_kegiatan" 
                                 type="text" 
                                 required 
-                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('nama_kegiatan') border-red-500 @enderror"
                                 placeholder="Nama kegiatan atau acara"
+                                value="{{ old('nama_kegiatan') }}"
                             >
+                            @error('nama_kegiatan')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Borrowing Purpose -->
@@ -191,9 +218,12 @@
                                 name="tujuan_peminjaman" 
                                 rows="2"
                                 required 
-                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none @error('tujuan_peminjaman') border-red-500 @enderror"
                                 placeholder="Jelaskan tujuan peminjaman..."
-                            ></textarea>
+                            >{{ old('tujuan_peminjaman') }}</textarea>
+                            @error('tujuan_peminjaman')
+                                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Row 3: Start and End Date -->
@@ -208,8 +238,12 @@
                                     type="date" 
                                     required 
                                     min="{{ date('Y-m-d') }}"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('tanggal_mulai_kegiatan') border-red-500 @enderror"
+                                    value="{{ old('tanggal_mulai_kegiatan') }}"
                                 >
+                                @error('tanggal_mulai_kegiatan')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
                                 <label for="tanggal_berakhir_kegiatan" class="block text-xs font-medium text-gray-700 mb-1">
@@ -221,10 +255,14 @@
                                     type="date" 
                                     required 
                                     min="{{ date('Y-m-d') }}"
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('tanggal_berakhir_kegiatan') border-red-500 @enderror"
+                                    value="{{ old('tanggal_berakhir_kegiatan') }}"
                                 >
+                                @error('tanggal_berakhir_kegiatan')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
-        </div>
+                        </div>
 
                         <!-- Row 4: Borrowing Type and Document -->
                         <div class="grid grid-cols-2 gap-3">
@@ -236,76 +274,49 @@
                                     id="jenis_peminjam" 
                                     name="jenis_peminjam" 
                                     required 
-                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('jenis_peminjam') border-red-500 @enderror"
                                 >
-                                    <option value="">-- Pilih Jenis --</option>
-                                    <option value="civitas_akademik">Civitas FMIPA</option>
-                                    <option value="non_civitas_akademik">Non-Civitas</option>
+                                    <option value="" disabled {{ old('jenis_peminjam') ? '' : 'selected' }}>-- Pilih Jenis --</option>
+                                    <option value="civitas_akademik" {{ old('jenis_peminjam') == 'civitas_akademik' ? 'selected' : '' }}>Civitas FMIPA</option>
+                                    <option value="non_civitas_akademik" {{ old('jenis_peminjam') == 'non_civitas_akademik' ? 'selected' : '' }}>Non-Civitas</option>
                                 </select>
+                                @error('jenis_peminjam')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
                                 <label for="surat_keterangan" class="block text-xs font-medium text-gray-700 mb-1">
-                                    Surat Keterangan (PDF)
+                                    Surat Keterangan (PDF, JPG, PNG)
                                 </label>
                                 <input 
                                     id="surat_keterangan" 
                                     name="surat_keterangan" 
                                     type="file" 
+                                    required 
+                                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 @error('surat_keterangan') border-red-500 @enderror"
                                     accept=".pdf,.jpg,.jpeg,.png"
-                                    required
-                                    class="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                 >
+                                @error('surat_keterangan')
+                                    <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
-
-                        <!-- Terms and Conditions -->
+                        
+                        <!-- Agreement Checkbox -->
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input 
-                                    id="terms" 
-                                    name="terms" 
-                                    type="checkbox" 
-                                    required
-                                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                >
+                                <input id="terms" name="terms" type="checkbox" required class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                             </div>
                             <div class="ml-3 text-sm">
-                                <label for="terms" class="font-medium text-gray-700">
-                                    Saya menyetujui syarat dan ketentuan
+                                <label for="terms" class="text-gray-600">
+                                    Saya menyetujui <a href="#" class="text-blue-600 hover:underline">syarat dan ketentuan</a>
                                 </label>
-                                <p class="text-gray-500 text-xs">
-                                    Dengan mendaftar, saya menyetujui untuk mematuhi semua aturan peminjaman barang SIMBARA dan bertanggung jawab penuh atas barang yang dipinjam.
-                                </p>
                             </div>
                         </div>
 
-                        <!-- Error Messages -->
-                        @if ($errors->any())
-                            <div class="bg-red-50 border border-red-200 rounded-lg p-3">
-                                <div class="flex">
-                                    <div class="flex-shrink-0">
-                                        <svg class="h-4 w-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
-                                    <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-red-800">
-                                            Terjadi kesalahan!
-                                        </h3>
-                                        <div class="mt-1 text-xs text-red-700">
-                                            <p>Silakan periksa kembali data yang Anda masukkan.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
                         <!-- Submit Button -->
-                        <div class="pt-2">
-                            <button 
-                                type="submit" 
-                                class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
-                            >
+                        <div>
+                            <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
                                 Daftar & Kirim Pengajuan
                             </button>
                         </div>

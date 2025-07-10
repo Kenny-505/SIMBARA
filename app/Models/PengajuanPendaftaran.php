@@ -17,6 +17,7 @@ class PengajuanPendaftaran extends Model
         'email',
         'no_hp',
         'no_identitas',
+        'nama_kegiatan',
         'tujuan_peminjaman',
         'surat_keterangan',
         'jenis_peminjam',

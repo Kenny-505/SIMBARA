@@ -32,10 +32,11 @@ class PendaftaranController extends Controller
             'email' => 'required|email|max:255|unique:pengajuan_pendaftaran,email',
             'no_hp' => 'required|string|max:20',
             'no_identitas' => 'required|string|max:50',
+            'nama_kegiatan' => 'required|string|max:255',
             'tujuan_peminjaman' => 'required|string',
             'tanggal_mulai_kegiatan' => 'required|date|after_or_equal:today',
             'tanggal_berakhir_kegiatan' => 'required|date|after_or_equal:tanggal_mulai_kegiatan',
-            'surat_keterangan' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120', // 5MB max
+            'surat_keterangan' => 'required|file|max:5120', // 5MB max
             'jenis_peminjam' => 'required|in:civitas_akademik,non_civitas_akademik',
         ], [
             'tanggal_mulai_kegiatan.after_or_equal' => 'Tanggal mulai kegiatan tidak boleh kurang dari hari ini.',
@@ -57,6 +58,7 @@ class PendaftaranController extends Controller
                 'email' => $request->email,
                 'no_hp' => $request->no_hp,
                 'no_identitas' => $request->no_identitas,
+                'nama_kegiatan' => $request->nama_kegiatan,
                 'tujuan_peminjaman' => $request->tujuan_peminjaman,
                 'tanggal_mulai_kegiatan' => $request->tanggal_mulai_kegiatan,
                 'tanggal_berakhir_kegiatan' => $request->tanggal_berakhir_kegiatan,

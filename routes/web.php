@@ -396,4 +396,140 @@ Route::get('/debug-payment/{id}', function($id) {
     ];
 })->name('debug.payment');
 
+// Temporary debug route to check image data in database
+Route::get('/debug-images', function() {
+    try {
+        // Method 1: Using Eloquent
+        $barangEloquent = \App\Models\Barang::select('id_barang', 'nama_barang', 'foto_1')->first();
+        
+        // Method 2: Using Query Builder
+        $barangQueryBuilder = \DB::table('barang')->select('id_barang', 'nama_barang', 'foto_1')->first();
+        
+        // Method 3: Using Raw PDO
+        $pdo = \DB::connection()->getPdo();
+        $stmt = $pdo->prepare("SELECT id_barang, nama_barang, foto_1, LENGTH(foto_1) as foto_1_size FROM barang WHERE foto_1 IS NOT NULL LIMIT 1");
+        $stmt->execute();
+        $barangRaw = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Method 4: Check if BLOB is being truncated
+        $blobCheck = \DB::select("SELECT id_barang, nama_barang, LENGTH(foto_1) as foto_1_size, SUBSTRING(foto_1, 1, 50) as foto_1_sample FROM barang WHERE foto_1 IS NOT NULL LIMIT 1");
+        
+        return response()->json([
+            'status' => 'success',
+            'method_1_eloquent' => [
+                'id' => $barangEloquent->id_barang ?? 'NULL',
+                'nama' => $barangEloquent->nama_barang ?? 'NULL',
+                'foto_1_exists' => !empty($barangEloquent->foto_1),
+                'foto_1_length' => $barangEloquent->foto_1 ? strlen($barangEloquent->foto_1) : 0,
+                'foto_1_type' => gettype($barangEloquent->foto_1 ?? null),
+            ],
+            'method_2_query_builder' => [
+                'id' => $barangQueryBuilder->id_barang ?? 'NULL',
+                'nama' => $barangQueryBuilder->nama_barang ?? 'NULL',
+                'foto_1_exists' => !empty($barangQueryBuilder->foto_1),
+                'foto_1_length' => $barangQueryBuilder->foto_1 ? strlen($barangQueryBuilder->foto_1) : 0,
+                'foto_1_type' => gettype($barangQueryBuilder->foto_1 ?? null),
+            ],
+            'method_3_raw_pdo' => $barangRaw,
+            'method_4_blob_check' => $blobCheck,
+            'php_info' => [
+                'memory_limit' => ini_get('memory_limit'),
+                'max_execution_time' => ini_get('max_execution_time'),
+                'pdo_mysql_version' => \DB::connection()->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION),
+            ]
+        ], 200, [], JSON_PRETTY_PRINT);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->name('debug.images');
+
+// Clear cache route
+Route::get('/clear-cache', function() {
+    try {
+        \Artisan::call('config:clear');
+        \Artisan::call('cache:clear');
+        \Artisan::call('view:clear');
+        \Artisan::call('route:clear');
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'All caches cleared successfully'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ]);
+    }
+})->name('clear.cache');
+
+// Test database configuration for BLOB handling
+Route::get('/debug-db-config', function() {
+    try {
+        $mysqlVars = \DB::select("SHOW VARIABLES WHERE Variable_name IN ('max_allowed_packet', 'group_concat_max_len', 'innodb_log_file_size', 'wait_timeout', 'interactive_timeout')");
+        
+        $mysqlStatus = \DB::select("SHOW STATUS WHERE Variable_name IN ('Bytes_sent', 'Bytes_received', 'Max_used_connections')");
+        
+        // Test simple BLOB query
+        $testQuery = \DB::select("SELECT id_barang, nama_barang, CHAR_LENGTH(foto_1) as foto_1_char_length, OCTET_LENGTH(foto_1) as foto_1_byte_length FROM barang WHERE foto_1 IS NOT NULL LIMIT 3");
+        
+        return response()->json([
+            'status' => 'success',
+            'mysql_variables' => $mysqlVars,
+            'mysql_status' => $mysqlStatus,
+            'test_query' => $testQuery,
+            'database_config' => [
+                'driver' => config('database.default'),
+                'host' => config('database.connections.mysql.host'),
+                'database' => config('database.connections.mysql.database'),
+                'charset' => config('database.connections.mysql.charset'),
+                'collation' => config('database.connections.mysql.collation'),
+            ]
+        ], 200, [], JSON_PRETTY_PRINT);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500, [], JSON_PRETTY_PRINT);
+    }
+})->name('debug.db.config');
+
+// Test specific image loading
+Route::get('/test-image/{id}', function($id) {
+    try {
+        // Direct PDO approach
+        $pdo = \DB::connection()->getPdo();
+        $stmt = $pdo->prepare("SELECT foto_1, LENGTH(foto_1) as size FROM barang WHERE id_barang = ? AND foto_1 IS NOT NULL");
+        $stmt->execute([$id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result && $result['foto_1']) {
+            $imageData = $result['foto_1'];
+            
+            return response($imageData)
+                ->header('Content-Type', 'image/jpeg')
+                ->header('Content-Length', strlen($imageData))
+                ->header('Cache-Control', 'public, max-age=31536000');
+        }
+        
+        return response()->json([
+            'status' => 'error',
+            'message' => 'No image found for ID: ' . $id,
+            'query_result' => $result
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'id' => $id
+        ]);
+    }
+})->name('test.image');
+
 require __DIR__.'/auth.php';

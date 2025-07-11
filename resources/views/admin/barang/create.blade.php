@@ -125,7 +125,15 @@
                     <label for="gambar_1" class="block text-sm font-medium text-gray-700 mb-2">
                         Foto 1 (Utama)
                     </label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+                    <!-- Preview Area -->
+                    <div id="preview_1" class="hidden mb-3">
+                        <img id="preview_image_1" class="w-full h-32 object-cover rounded-lg border">
+                        <button type="button" onclick="removeImage(1)" class="mt-2 text-sm text-red-600 hover:text-red-800">
+                            × Hapus gambar
+                        </button>
+                    </div>
+                    <!-- Upload Area -->
+                    <div id="upload_area_1" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
                         <div class="space-y-1 text-center">
                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -133,11 +141,11 @@
                             <div class="flex text-sm text-gray-600">
                                 <label for="gambar_1" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                     <span>Upload foto</span>
-                                    <input id="gambar_1" name="gambar_1" type="file" class="sr-only" accept="image/*">
+                                    <input id="gambar_1" name="gambar_1" type="file" class="sr-only" accept="image/*" onchange="previewImage(1)">
                                 </label>
                                 <p class="pl-1">atau drag and drop</p>
                             </div>
-                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 2MB</p>
                         </div>
                     </div>
                     @error('gambar_1')
@@ -146,11 +154,19 @@
                 </div>
 
                 <!-- Foto 2 -->
-                                        <div>
+                <div>
                     <label for="gambar_2" class="block text-sm font-medium text-gray-700 mb-2">
                         Foto 2 (Opsional)
                     </label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+                    <!-- Preview Area -->
+                    <div id="preview_2" class="hidden mb-3">
+                        <img id="preview_image_2" class="w-full h-32 object-cover rounded-lg border">
+                        <button type="button" onclick="removeImage(2)" class="mt-2 text-sm text-red-600 hover:text-red-800">
+                            × Hapus gambar
+                        </button>
+                    </div>
+                    <!-- Upload Area -->
+                    <div id="upload_area_2" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
                         <div class="space-y-1 text-center">
                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -158,24 +174,32 @@
                             <div class="flex text-sm text-gray-600">
                                 <label for="gambar_2" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                     <span>Upload foto</span>
-                                    <input id="gambar_2" name="gambar_2" type="file" class="sr-only" accept="image/*">
-                                            </label>
+                                    <input id="gambar_2" name="gambar_2" type="file" class="sr-only" accept="image/*" onchange="previewImage(2)">
+                                </label>
                                 <p class="pl-1">atau drag and drop</p>
                             </div>
-                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                                                </div>
-                                            </div>
+                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 2MB</p>
+                        </div>
+                    </div>
                     @error('gambar_2')
-                                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                            @enderror
-                                        </div>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
 
                 <!-- Foto 3 -->
                 <div>
                     <label for="gambar_3" class="block text-sm font-medium text-gray-700 mb-2">
                         Foto 3 (Opsional)
                     </label>
-                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+                    <!-- Preview Area -->
+                    <div id="preview_3" class="hidden mb-3">
+                        <img id="preview_image_3" class="w-full h-32 object-cover rounded-lg border">
+                        <button type="button" onclick="removeImage(3)" class="mt-2 text-sm text-red-600 hover:text-red-800">
+                            × Hapus gambar
+                        </button>
+                    </div>
+                    <!-- Upload Area -->
+                    <div id="upload_area_3" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
                         <div class="space-y-1 text-center">
                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -183,11 +207,11 @@
                             <div class="flex text-sm text-gray-600">
                                 <label for="gambar_3" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                     <span>Upload foto</span>
-                                    <input id="gambar_3" name="gambar_3" type="file" class="sr-only" accept="image/*">
+                                    <input id="gambar_3" name="gambar_3" type="file" class="sr-only" accept="image/*" onchange="previewImage(3)">
                                 </label>
                                 <p class="pl-1">atau drag and drop</p>
                             </div>
-                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                            <p class="text-xs text-gray-500">PNG, JPG, GIF up to 2MB</p>
                         </div>
                     </div>
                     @error('gambar_3')
@@ -270,7 +294,86 @@ function validateStock() {
     
     if (stokTersedia > stokTotal) {
         document.getElementById('stok_tersedia').value = stokTotal;
-            }
+    }
+}
+
+// Image preview functionality
+function previewImage(imageNumber) {
+    const input = document.getElementById(`gambar_${imageNumber}`);
+    const preview = document.getElementById(`preview_${imageNumber}`);
+    const previewImage = document.getElementById(`preview_image_${imageNumber}`);
+    const uploadArea = document.getElementById(`upload_area_${imageNumber}`);
+    
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Check file size (2MB = 2048KB)
+        if (file.size > 2048 * 1024) {
+            alert('Ukuran file terlalu besar. Maksimal 2MB.');
+            input.value = '';
+            return;
         }
+        
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+            alert('File harus berupa gambar (PNG, JPG, GIF).');
+            input.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            preview.classList.remove('hidden');
+            uploadArea.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Remove image functionality
+function removeImage(imageNumber) {
+    const input = document.getElementById(`gambar_${imageNumber}`);
+    const preview = document.getElementById(`preview_${imageNumber}`);
+    const previewImage = document.getElementById(`preview_image_${imageNumber}`);
+    const uploadArea = document.getElementById(`upload_area_${imageNumber}`);
+    
+    // Clear input
+    input.value = '';
+    
+    // Hide preview and show upload area
+    preview.classList.add('hidden');
+    uploadArea.classList.remove('hidden');
+    
+    // Clear image src
+    previewImage.src = '';
+}
+
+// Drag and drop functionality
+for (let i = 1; i <= 3; i++) {
+    const uploadArea = document.getElementById(`upload_area_${i}`);
+    const input = document.getElementById(`gambar_${i}`);
+    
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('border-blue-400', 'bg-blue-50');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            input.files = files;
+            previewImage(i);
+        }
+    });
+}
     </script>
 @endsection 

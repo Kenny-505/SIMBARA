@@ -142,8 +142,8 @@
                 <div class="border border-gray-200 rounded-lg p-6">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center">
-                            @if($peminjamanBarang->barang->foto_barang)
-                                <img src="data:image/jpeg;base64,{{ base64_encode($peminjamanBarang->barang->foto_barang) }}" 
+                                            @if($peminjamanBarang->barang->foto_1)
+                    <img src="data:image/jpeg;base64,{{ base64_encode($peminjamanBarang->barang->foto_1) }}" 
                                      alt="{{ $peminjamanBarang->barang->nama_barang }}"
                                      class="w-20 h-20 object-cover rounded-lg mr-4">
                             @else
@@ -156,7 +156,7 @@
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-900">{{ $peminjamanBarang->barang->nama_barang }}</h3>
                                 <p class="text-sm text-gray-600">Jumlah Dipinjam: {{ $peminjamanBarang->jumlah_pinjam }}</p>
-                                <p class="text-sm text-gray-600">Kode Barang: {{ $peminjamanBarang->barang->kode_barang }}</p>
+                                                                    <p class="text-sm text-gray-600">ID Barang: {{ $peminjamanBarang->barang->id_barang }}</p>
                             </div>
                         </div>
                     </div>
@@ -196,7 +196,7 @@
                                             Unit {{ $unit }}
                                         </div>
                                         <div class="w-32 text-xs text-gray-500">
-                                            {{ $peminjamanBarang->barang->kode_barang }}-{{ $unit }}
+                                            {{ $peminjamanBarang->barang->id_barang }}-{{ $unit }}
                                         </div>
                                         <div class="flex-1">
                                             <select id="items_{{ $index }}_unit_{{ $unit }}_kondisi"

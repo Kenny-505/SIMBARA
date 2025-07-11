@@ -117,7 +117,7 @@
         <!-- Item Image -->
         <div class="aspect-w-16 aspect-h-9 bg-gray-100">
             @if($barang->foto_1)
-                <img src="{{ route('user.barang.image', ['id' => $barang->id_barang, 'image' => 1]) }}" 
+                <img src="data:image/jpeg;base64,{{ base64_encode($barang->foto_1) }}" 
                      alt="{{ $barang->nama_barang }}" 
                      class="w-full h-48 object-cover">
             @else

@@ -1,0 +1,1 @@
+'Database: ' . config('database.connections.mysql.database') . PHP_EOL; \$db = DB::select('SELECT DATABASE() as current_db'); echo 'Connected to: ' . \$db[0]- . PHP_EOL;

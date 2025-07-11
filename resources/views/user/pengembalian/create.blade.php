@@ -98,8 +98,8 @@
                 <div class="border border-gray-200 rounded-lg p-4">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center">
-                            @if($peminjamanBarang->barang->foto_barang)
-                                <img src="data:image/jpeg;base64,{{ base64_encode($peminjamanBarang->barang->foto_barang) }}" 
+                                            @if($peminjamanBarang->barang->foto_1)
+                    <img src="data:image/jpeg;base64,{{ base64_encode($peminjamanBarang->barang->foto_1) }}" 
                                      alt="{{ $peminjamanBarang->barang->nama_barang }}"
                                      class="w-16 h-16 object-cover rounded-lg mr-4">
                             @else

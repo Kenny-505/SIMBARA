@@ -85,14 +85,8 @@ class BarangController extends Controller
             'gambar_3' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
         
-        // Generate unique kode_barang
-        do {
-            $kode = strtoupper(Str::random(8));
-        } while (Barang::where('kode_barang', $kode)->exists());
-        
         $data = $request->all();
         $data['id_admin'] = $admin->id_admin;
-        $data['kode_barang'] = $kode;
         
         // Handle image uploads
         foreach (['gambar_1', 'gambar_2', 'gambar_3'] as $index => $imageField) {
@@ -201,12 +195,7 @@ class BarangController extends Controller
             return back()->with('error', 'Barang tidak dapat dihapus karena sedang dipinjam.');
         }
         
-        // Delete images
-        foreach (['gambar_1', 'gambar_2', 'gambar_3'] as $imageField) {
-            if ($barang->$imageField && file_exists(public_path('images/barang/' . $barang->$imageField))) {
-                unlink(public_path('images/barang/' . $barang->$imageField));
-            }
-        }
+        // Images are stored in database as BLOB, no files to delete
         
         $barang->delete();
         
@@ -219,14 +208,41 @@ class BarangController extends Controller
      */
     public function getImage($id, $image = 1)
     {
-        $barang = Barang::findOrFail($id);
-        $fotoField = 'foto_' . $image;
-        
-        if (!$barang->$fotoField) {
+        try {
+            // Use direct PDO query to get LONGBLOB data
+            $pdo = \DB::connection()->getPdo();
+            $stmt = $pdo->prepare("SELECT foto_{$image} FROM barang WHERE id_barang = ? AND foto_{$image} IS NOT NULL");
+            $stmt->execute([$id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result && isset($result["foto_{$image}"])) {
+                $imageData = $result["foto_{$image}"];
+                
+                \Log::info('Admin Image found', [
+                    'id' => $id,
+                    'image' => $image,
+                    'dataLength' => strlen($imageData)
+                ]);
+                
+                return response($imageData)
+                    ->header('Content-Type', 'image/jpeg');
+            }
+            
+            \Log::warning('Admin Image not found', [
+                'id' => $id,
+                'image' => $image
+            ]);
+            
+            abort(404);
+                
+        } catch (\Exception $e) {
+            \Log::error('Admin Image loading error', [
+                'id' => $id,
+                'image' => $image,
+                'error' => $e->getMessage()
+            ]);
+            
             abort(404);
         }
-        
-        return response($barang->$fotoField)
-            ->header('Content-Type', 'image/jpeg');
     }
 } 

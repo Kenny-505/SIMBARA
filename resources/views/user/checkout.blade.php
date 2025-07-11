@@ -205,7 +205,7 @@
                     <div class="flex items-center space-x-3">
                         <div class="flex-shrink-0">
                             @if($item['barang']->foto_1)
-                                <img src="{{ route('user.barang.image', ['id' => $item['barang']->id_barang, 'image' => 1]) }}" 
+                                <img src="data:image/jpeg;base64,{{ base64_encode($item['barang']->foto_1) }}" 
                                      alt="{{ $item['barang']->nama_barang }}" 
                                      class="w-12 h-12 object-cover rounded-lg">
                             @else

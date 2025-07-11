@@ -19,7 +19,7 @@
         <!-- Main Image -->
         <div class="bg-gray-100 rounded-lg p-8 mb-4 flex items-center justify-center h-80">
             @if($barang->foto_1)
-                <img id="mainImage" src="{{ route('user.barang.image', ['id' => $barang->id_barang, 'image' => 1]) }}" 
+                <img id="mainImage" src="data:image/jpeg;base64,{{ base64_encode($barang->foto_1) }}" 
                      alt="{{ $barang->nama_barang }}" 
                      class="max-w-full max-h-full object-contain">
             @else
@@ -37,8 +37,8 @@
             @for($i = 1; $i <= 3; $i++)
                 @if($barang->{'foto_' . $i})
                     <div class="bg-gray-100 rounded-lg p-4 flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition-colors thumbnail-image"
-                                             onclick="changeMainImage('{{ route('user.barang.image', ['id' => $barang->id_barang, 'image' => $i]) }}')">
-                    <img src="{{ route('user.barang.image', ['id' => $barang->id_barang, 'image' => $i]) }}" 
+                                             onclick="changeMainImage('data:image/jpeg;base64,{{ base64_encode($barang->{'foto_' . $i}) }}')">
+                    <img src="data:image/jpeg;base64,{{ base64_encode($barang->{'foto_' . $i}) }}" 
                              alt="{{ $barang->nama_barang }} - Foto {{ $i }}" 
                              class="max-w-full max-h-full object-contain">
                     </div>
@@ -152,7 +152,7 @@
             <!-- Item Image -->
             <div class="aspect-w-16 aspect-h-9 bg-gray-100">
                 @if($item->foto_1)
-                                            <img src="{{ route('user.barang.image', ['id' => $item->id_barang, 'image' => 1]) }}" 
+                                            <img src="data:image/jpeg;base64,{{ base64_encode($item->foto_1) }}" 
                          alt="{{ $item->nama_barang }}" 
                          class="w-full h-32 object-cover">
                 @else

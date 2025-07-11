@@ -87,7 +87,7 @@
                                     <div class="flex justify-between items-center">
                                         <div>
                                             <p class="text-sm font-medium text-gray-900">{{ $item->nama_barang }}</p>
-                            <p class="text-xs text-gray-500">Kode: {{ $item->kode_barang ?? 'N/A' }}</p>
+                                                            <p class="text-xs text-gray-500">ID: {{ $item->id_barang ?? 'N/A' }}</p>
                                         </div>
                                         <div class="text-right">
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $item->stok_tersedia <= ($item->stok_total * 0.1) ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">

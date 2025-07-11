@@ -226,8 +226,8 @@
             @foreach($pengembalian->pengembalianBarangs as $item)
             <div class="border border-gray-200 rounded-lg p-4">
                 <div class="flex items-center">
-                    @if($item->barang->foto_barang)
-                        <img src="data:image/jpeg;base64,{{ base64_encode($item->barang->foto_barang) }}" 
+                    @if($item->barang->foto_1)
+                        <img src="data:image/jpeg;base64,{{ base64_encode($item->barang->foto_1) }}" 
                              alt="{{ $item->barang->nama_barang }}"
                              class="w-16 h-16 object-cover rounded-lg mr-4">
                     @else

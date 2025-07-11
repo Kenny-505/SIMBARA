@@ -40,20 +40,45 @@ class BarangController extends Controller
      */
     public function getImage($id, $imageNumber = 1)
     {
-        $barang = Barang::findOrFail($id);
-        
-        $imageField = "foto_{$imageNumber}";
-        $imageData = $barang->{$imageField};
-
-        if (!$imageData) {
-            // Return default placeholder image - use existing image as placeholder
+        try {
+            // Use direct PDO query to get LONGBLOB data
+            $pdo = \DB::connection()->getPdo();
+            $stmt = $pdo->prepare("SELECT foto_{$imageNumber} FROM barang WHERE id_barang = ? AND foto_{$imageNumber} IS NOT NULL");
+            $stmt->execute([$id]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result && isset($result["foto_{$imageNumber}"])) {
+                $imageData = $result["foto_{$imageNumber}"];
+                
+                \Log::info('User Image found', [
+                    'id' => $id,
+                    'imageNumber' => $imageNumber,
+                    'dataLength' => strlen($imageData)
+                ]);
+                
+                return response($imageData)
+                    ->header('Content-Type', 'image/jpeg')
+                    ->header('Cache-Control', 'public, max-age=31536000');
+            }
+            
+            \Log::warning('User Image not found', [
+                'id' => $id,
+                'imageNumber' => $imageNumber
+            ]);
+            
+            // Return default placeholder image
+            return response()->file(public_path('images/image.png'));
+                
+        } catch (\Exception $e) {
+            \Log::error('User Image loading error', [
+                'id' => $id,
+                'imageNumber' => $imageNumber,
+                'error' => $e->getMessage()
+            ]);
+            
+            // Return default placeholder image on error
             return response()->file(public_path('images/image.png'));
         }
-
-        // Return the image from BLOB
-        return response($imageData)
-            ->header('Content-Type', 'image/jpeg')
-            ->header('Cache-Control', 'public, max-age=31536000');
     }
 
     /**

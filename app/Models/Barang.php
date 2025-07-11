@@ -136,4 +136,45 @@ class Barang extends Model
             'parah' => $this->denda_parah + $latePenalty
         ];
     }
+
+    /**
+     * Check if image exists for the given field
+     */
+    public function hasImage($field)
+    {
+        $value = $this->attributes[$field] ?? null;
+        return !empty($value) && is_string($value) && strlen($value) > 0;
+    }
+
+    /**
+     * Get image data for the given field
+     */
+    public function getImageData($field)
+    {
+        return $this->attributes[$field] ?? null;
+    }
+
+    /**
+     * Accessor for foto_1 to ensure proper BLOB handling
+     */
+    public function getFoto1Attribute($value)
+    {
+        return $value;
+    }
+
+    /**
+     * Accessor for foto_2 to ensure proper BLOB handling
+     */
+    public function getFoto2Attribute($value)
+    {
+        return $value;
+    }
+
+    /**
+     * Accessor for foto_3 to ensure proper BLOB handling
+     */
+    public function getFoto3Attribute($value)
+    {
+        return $value;
+    }
 }

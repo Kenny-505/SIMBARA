@@ -268,6 +268,7 @@
                 @error('tanggal_kembali')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                 @enderror
+                <p class="text-xs text-gray-500 mt-1">Maksimal 7 hari dari tanggal mulai</p>
             </div>
         </div>
     </div>
@@ -534,6 +535,61 @@ function addNewItemRow() {
     
     container.appendChild(itemRow);
 }
+
+// Date validation for 7-day limit
+function updateDateLimits() {
+    const startDate = document.getElementById('tanggal_pinjam').value;
+    const endDateInput = document.getElementById('tanggal_kembali');
+    
+    if (startDate) {
+        const startDateObj = new Date(startDate);
+        
+        // Set minimum end date (day after start date)
+        const minEndDate = new Date(startDateObj);
+        minEndDate.setDate(minEndDate.getDate() + 1);
+        endDateInput.min = minEndDate.toISOString().split('T')[0];
+        
+        // Set maximum end date (7 days from start date)
+        const maxEndDate = new Date(startDateObj);
+        maxEndDate.setDate(maxEndDate.getDate() + 7);
+        endDateInput.max = maxEndDate.toISOString().split('T')[0];
+        
+        // Clear end date if it's outside the valid range
+        if (endDateInput.value) {
+            const currentEndDate = new Date(endDateInput.value);
+            if (currentEndDate < minEndDate || currentEndDate > maxEndDate) {
+                endDateInput.value = '';
+            }
+        }
+    }
+}
+
+// Add event listener for start date changes
+document.getElementById('tanggal_pinjam').addEventListener('change', updateDateLimits);
+
+// Add form validation
+document.getElementById('editForm').addEventListener('submit', function(e) {
+    const startDate = document.getElementById('tanggal_pinjam').value;
+    const endDate = document.getElementById('tanggal_kembali').value;
+    
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = end - start;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays > 7) {
+            e.preventDefault();
+            alert('Durasi peminjaman maksimal 7 hari');
+            return;
+        }
+    }
+});
+
+// Initialize date limits on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateDateLimits();
+});
 </script>
 
 @endsection 

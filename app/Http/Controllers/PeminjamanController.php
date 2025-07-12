@@ -135,13 +135,14 @@ class PeminjamanController extends Controller
         $request->validate([
             'tujuan_peminjaman' => 'required|string|max:255',
             'tanggal_pinjam' => 'required|date|after_or_equal:' . Carbon::now()->addDays(3)->format('Y-m-d'),
-            'tanggal_kembali' => 'required|date|after:tanggal_pinjam',
+            'tanggal_kembali' => 'required|date|after:tanggal_pinjam|before_or_equal:' . Carbon::parse($request->tanggal_pinjam)->addDays(7)->format('Y-m-d'),
             'nama_pengambil' => 'required|string|max:255',
             'nomor_identitas' => 'required|string|max:50',
             'nomor_hp' => 'required|string|max:20'
         ], [
             'tanggal_pinjam.after_or_equal' => 'Tanggal peminjaman harus minimal H-3 dari hari ini',
-            'tanggal_kembali.after' => 'Tanggal kembali harus setelah tanggal pinjam'
+            'tanggal_kembali.after' => 'Tanggal kembali harus setelah tanggal pinjam',
+            'tanggal_kembali.before_or_equal' => 'Durasi peminjaman maksimal 7 hari'
         ]);
 
         \Log::info('Validation passed');
@@ -768,10 +769,14 @@ class PeminjamanController extends Controller
         $request->validate([
             'tujuan_peminjaman' => 'required|string|max:255',
             'tanggal_pinjam' => 'required|date|after_or_equal:' . Carbon::now()->addDays(3)->format('Y-m-d'),
-            'tanggal_kembali' => 'required|date|after:tanggal_pinjam',
+            'tanggal_kembali' => 'required|date|after:tanggal_pinjam|before_or_equal:' . Carbon::parse($request->tanggal_pinjam)->addDays(7)->format('Y-m-d'),
             'items' => 'required|array|min:1',
             'items.*.id_barang' => 'required|exists:barang,id_barang',
             'items.*.jumlah' => 'required|integer|min:1'
+        ], [
+            'tanggal_pinjam.after_or_equal' => 'Tanggal peminjaman harus minimal H-3 dari hari ini',
+            'tanggal_kembali.after' => 'Tanggal kembali harus setelah tanggal pinjam',
+            'tanggal_kembali.before_or_equal' => 'Durasi peminjaman maksimal 7 hari'
         ]);
 
         DB::beginTransaction();

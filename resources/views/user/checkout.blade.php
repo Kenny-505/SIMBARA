@@ -115,7 +115,7 @@
                                value="{{ old('tanggal_kembali') }}"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('tanggal_kembali') border-red-500 @enderror"
                                onchange="calculateDuration();">
-                        <p class="text-xs text-gray-500 mt-1">Tanggal pengembalian barang</p>
+                        <p class="text-xs text-gray-500 mt-1">Tanggal pengembalian barang (maksimal 7 hari)</p>
                         @error('tanggal_kembali')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -287,13 +287,23 @@ function updateEndDateMin() {
     
     if (startDate) {
         const startDateObj = new Date(startDate);
-        startDateObj.setDate(startDateObj.getDate() + 1);
-        const minEndDate = startDateObj.toISOString().split('T')[0];
-        endDateInput.min = minEndDate;
         
-        // Reset end date if it's before the new minimum
-        if (endDateInput.value && endDateInput.value < minEndDate) {
-            endDateInput.value = '';
+        // Set minimum end date (day after start date)
+        const minEndDate = new Date(startDateObj);
+        minEndDate.setDate(minEndDate.getDate() + 1);
+        endDateInput.min = minEndDate.toISOString().split('T')[0];
+        
+        // Set maximum end date (7 days from start date)
+        const maxEndDate = new Date(startDateObj);
+        maxEndDate.setDate(maxEndDate.getDate() + 7);
+        endDateInput.max = maxEndDate.toISOString().split('T')[0];
+        
+        // Reset end date if it's outside the valid range
+        if (endDateInput.value) {
+            const currentEndDate = new Date(endDateInput.value);
+            if (currentEndDate < minEndDate || currentEndDate > maxEndDate) {
+                endDateInput.value = '';
+            }
         }
     }
 }
@@ -391,6 +401,18 @@ document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     if (end <= start) {
         e.preventDefault();
         alert('Tanggal selesai harus setelah tanggal mulai');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Lanjut ke Konfirmasi';
+        return;
+    }
+    
+    // Validate maximum 7 days duration
+    const diffTime = end - start;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays > 7) {
+        e.preventDefault();
+        alert('Durasi peminjaman maksimal 7 hari');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Lanjut ke Konfirmasi';
         return;

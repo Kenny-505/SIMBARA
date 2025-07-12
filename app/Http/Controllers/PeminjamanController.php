@@ -41,6 +41,8 @@ class PeminjamanController extends Controller
                 $query->whereIn('status_pengajuan', ['draft', 'pending_approval', 'approved', 'confirmed'])
                       ->orWhere('status_peminjaman', 'ongoing');
             })
+            ->whereNotIn('status_peminjaman', ['returned', 'completed'])
+            ->whereNotIn('status_pengajuan', ['completed'])
             ->exists();
 
         if ($activeLoan) {
@@ -150,6 +152,7 @@ class PeminjamanController extends Controller
                 $query->whereIn('status_pengajuan', ['draft', 'pending_approval', 'approved', 'confirmed'])
                       ->orWhere('status_peminjaman', 'ongoing');
             })
+            ->whereNotIn('status_peminjaman', ['returned', 'completed'])
             ->exists();
 
         if ($activeLoan) {

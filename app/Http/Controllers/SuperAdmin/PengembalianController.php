@@ -215,7 +215,9 @@ class PengembalianController extends Controller
             if ($totalAllDenda == 0) {
                 // No penalty - complete immediately and return stock
                 $pengembalian->update(['status_pengembalian' => 'completed']);
-                $peminjaman->update(['status_peminjaman' => 'returned']);
+                $peminjaman->update([
+                    'status_peminjaman' => 'returned'
+                ]);
                 
                 // Return stock based on condition
                 $this->updateStockAfterReturn($pengembalian);
@@ -457,7 +459,9 @@ class PengembalianController extends Controller
             if ($totalAllDenda == 0) {
                 // No penalty - complete immediately and return stock
                 $pengembalian->update(['status_pengembalian' => 'completed']);
-                $peminjaman->update(['status_peminjaman' => 'returned']);
+                $peminjaman->update([
+                    'status_peminjaman' => 'returned'
+                ]);
                 
                 // Return stock based on condition
                 $this->updateStockAfterReturn($pengembalian);
@@ -617,7 +621,9 @@ class PengembalianController extends Controller
             if ($totalAllDenda == 0) {
                 // No penalty - complete immediately and return stock
                 $pengembalian->update(['status_pengembalian' => 'completed']);
-                $peminjaman->update(['status_peminjaman' => 'returned']);
+                $peminjaman->update([
+                    'status_peminjaman' => 'returned'
+                ]);
                 
                 // Return stock to inventory based on condition
                 $this->updateStockAfterReturn($pengembalian);
@@ -695,6 +701,12 @@ class PengembalianController extends Controller
             $admin = auth()->guard('admin')->user();
 
             if ($request->action === 'approve') {
+                \Log::info('PengembalianController verifyPenaltyPayment - payment approved', [
+                    'pengembalian_id' => $pengembalian->id_pengembalian,
+                    'current_status_pengembalian' => $pengembalian->status_pengembalian,
+                    'caller' => 'PengembalianController::verifyPenaltyPayment'
+                ]);
+                
                 // Payment approved - complete the return process
                 $pengembalian->update([
                     'status_pengembalian' => 'fully_completed',
@@ -705,10 +717,21 @@ class PengembalianController extends Controller
                 ]);
 
                 // Update peminjaman status
-                $peminjaman->update(['status_peminjaman' => 'returned']);
+                $peminjaman->update([
+                    'status_peminjaman' => 'returned'
+                ]);
+
+                \Log::info('About to call updateStockAfterReturn from PengembalianController', [
+                    'pengembalian_id' => $pengembalian->id_pengembalian,
+                    'caller' => 'PengembalianController::verifyPenaltyPayment'
+                ]);
 
                 // Return stock to inventory based on condition
                 $this->updateStockAfterReturn($pengembalian);
+
+                \Log::info('Stock update completed via PengembalianController', [
+                    'pengembalian_id' => $pengembalian->id_pengembalian
+                ]);
 
                 $message = "Pembayaran denda berhasil diverifikasi. Pengembalian telah selesai sepenuhnya dan stok diperbarui sesuai kondisi barang.";
                 
@@ -754,6 +777,26 @@ class PengembalianController extends Controller
      */
     private function updateStockAfterReturn(Pengembalian $pengembalian)
     {
+        // Prevent duplicate stock updates by checking if stock has already been returned
+        $cacheKey = "stock_returned_pengembalian_{$pengembalian->id_pengembalian}";
+        
+        // Check if stock has already been returned for this pengembalian
+        if (\Cache::has($cacheKey)) {
+            \Log::warning('Duplicate stock update attempt prevented', [
+                'pengembalian_id' => $pengembalian->id_pengembalian,
+                'cache_key' => $cacheKey
+            ]);
+            return;
+        }
+        
+        // Mark that stock update is in progress (prevent race conditions)
+        \Cache::put($cacheKey, true, 300); // 5 minutes cache
+        
+        \Log::info('Starting stock update after return', [
+            'pengembalian_id' => $pengembalian->id_pengembalian,
+            'status_pengembalian' => $pengembalian->status_pengembalian
+        ]);
+
         // Ensure relationships are loaded to be safe
         $pengembalian->loadMissing('pengembalianBarangs.barang');
 
@@ -763,6 +806,9 @@ class PengembalianController extends Controller
 
             $jumlahKembali = $item->jumlah_kembali;
             $barang = $item->barang;
+            
+            $oldStokTersedia = $barang->stok_tersedia;
+            $oldStokTotal = $barang->stok_total;
 
             if ($item->kondisi_barang === 'parah') {
                 // Item is severely damaged/lost.
@@ -774,13 +820,37 @@ class PengembalianController extends Controller
                     $barang->stok_tersedia = $barang->stok_total;
                     $barang->save();
                 }
+                
+                \Log::info('Stock updated for damaged item', [
+                    'barang_id' => $barang->id_barang,
+                    'nama_barang' => $barang->nama_barang,
+                    'kondisi' => $item->kondisi_barang,
+                    'jumlah_kembali' => $jumlahKembali,
+                    'old_stok_total' => $oldStokTotal,
+                    'new_stok_total' => $barang->fresh()->stok_total,
+                    'stok_tersedia' => $barang->fresh()->stok_tersedia
+                ]);
 
             } else {
                 // Item is returned in a usable condition.
                 // Return to available stock.
                 $barang->increment('stok_tersedia', $jumlahKembali);
+                
+                \Log::info('Stock updated for returned item', [
+                    'barang_id' => $barang->id_barang,
+                    'nama_barang' => $barang->nama_barang,
+                    'kondisi' => $item->kondisi_barang,
+                    'jumlah_kembali' => $jumlahKembali,
+                    'old_stok_tersedia' => $oldStokTersedia,
+                    'new_stok_tersedia' => $barang->fresh()->stok_tersedia,
+                    'stok_total' => $barang->stok_total
+                ]);
             }
         }
+        
+        \Log::info('Stock update completed', [
+            'pengembalian_id' => $pengembalian->id_pengembalian
+        ]);
     }
     
     /**

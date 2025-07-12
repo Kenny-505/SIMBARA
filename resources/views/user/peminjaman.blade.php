@@ -179,8 +179,28 @@
                 </a>
                 <span class="text-sm text-gray-500">Menunggu review admin</span>
 
-            @elseif($peminjaman->status_pengajuan === 'approved' && $peminjaman->status_peminjaman !== 'ongoing')
-                <!-- Approved - can confirm (only if not already ongoing) -->
+            @elseif($peminjaman->status_pengajuan === 'approved' && ($peminjaman->status_peminjaman === 'ongoing' && $peminjaman->status_pembayaran === 'pending'))
+                <!-- Approved but ongoing with pending payment - need confirmation -->
+                @php
+                    $allApproved = $peminjaman->peminjamanBarangs->every(function($item) {
+                        return $item->status_persetujuan === 'approved';
+                    });
+                @endphp
+                @if($allApproved)
+                    <form action="{{ route('user.pengajuan.confirm', $peminjaman->id_peminjaman) }}" method="POST" class="inline">
+                        @csrf
+                        <button type="submit" 
+                                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+                                onclick="return confirm('Yakin ingin konfirmasi peminjaman ini?')">
+                            Konfirmasi Peminjaman
+                        </button>
+                    </form>
+                @else
+                    <span class="text-sm text-gray-500">Menunggu persetujuan semua barang</span>
+                @endif
+
+            @elseif($peminjaman->status_pengajuan === 'approved' && in_array($peminjaman->status_peminjaman, ['pending', 'approved']))
+                <!-- Approved - can confirm (normal flow) -->
                 @php
                     $allApproved = $peminjaman->peminjamanBarangs->every(function($item) {
                         return $item->status_persetujuan === 'approved';

@@ -157,6 +157,13 @@ class TransaksiController extends Controller
                     $pengembalian = $transaksi->pengembalian;
                     $peminjaman = $pengembalian->peminjaman;
                     
+                    \Log::info('TransaksiController processing denda payment approval', [
+                        'transaksi_id' => $transaksi->id_transaksi,
+                        'pengembalian_id' => $pengembalian->id_pengembalian,
+                        'peminjaman_id' => $peminjaman->id_peminjaman,
+                        'current_status_pengembalian' => $pengembalian->status_pengembalian
+                    ]);
+                    
                     // Update pengembalian status to fully_completed
                     $pengembalian->update([
                         'status_pengembalian' => 'fully_completed',
@@ -164,12 +171,23 @@ class TransaksiController extends Controller
                     ]);
                     
                     // Update peminjaman status to returned
-                    $peminjaman->update(['status_peminjaman' => 'returned']);
+                    $peminjaman->update([
+                        'status_peminjaman' => 'returned'
+                    ]);
+                    
+                    \Log::info('About to call updateStockAfterReturnPublic from TransaksiController', [
+                        'pengembalian_id' => $pengembalian->id_pengembalian,
+                        'caller' => 'TransaksiController::updateStatus'
+                    ]);
                     
                     // Return stock using proper logic that considers item condition
                     // Call the method from PengembalianController to maintain consistency
                     $pengembalianController = app(\App\Http\Controllers\SuperAdmin\PengembalianController::class);
                     $pengembalianController->updateStockAfterReturnPublic($pengembalian);
+                    
+                    \Log::info('Stock update completed via TransaksiController', [
+                        'pengembalian_id' => $pengembalian->id_pengembalian
+                    ]);
                 }
             } elseif ($status === 'rejected') {
                 // Handle rejection based on transaction type

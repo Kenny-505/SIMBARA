@@ -106,14 +106,20 @@
                 @foreach($peminjaman->peminjamanBarangs as $item)
                 <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                     <div class="flex items-center">
-                        <div class="w-8 h-8 bg-gray-300 rounded-lg flex items-center justify-center mr-3">
-                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                            </svg>
-                        </div>
+                        @if($item->barang->foto_1)
+                            <img src="data:image/jpeg;base64,{{ base64_encode($item->barang->foto_1) }}" 
+                                 alt="{{ $item->barang->nama_barang }}"
+                                 class="w-8 h-8 object-cover rounded-lg mr-3">
+                        @else
+                            <div class="w-8 h-8 bg-gray-300 rounded-lg flex items-center justify-center mr-3">
+                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                </svg>
+                            </div>
+                        @endif
                         <div>
                             <p class="text-sm font-medium text-gray-900">{{ $item->barang->nama_barang }}</p>
-                                                                        <p class="text-xs text-gray-500">{{ $item->barang->admin->nama_lengkap ?? 'Admin' }}</p>
+                            <p class="text-xs text-gray-500">{{ $item->barang->admin->nama_lengkap ?? 'Admin' }}</p>
                         </div>
                     </div>
                     <div class="text-right">

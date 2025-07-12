@@ -48,11 +48,17 @@
                     @foreach($approvedItems as $item)
                         <div class="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-4">
                             <div class="flex items-center">
-                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                                    </svg>
-                                </div>
+                                @if($item->barang->foto_1)
+                                    <img src="data:image/jpeg;base64,{{ base64_encode($item->barang->foto_1) }}" 
+                                         alt="{{ $item->barang->nama_barang }}"
+                                         class="w-10 h-10 object-cover rounded-lg mr-3">
+                                @else
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                        </svg>
+                                    </div>
+                                @endif
                                 <div>
                                     <h3 class="font-medium text-gray-900">{{ $item->barang->nama_barang }}</h3>
                                     <p class="text-sm text-gray-600">{{ $item->barang->admin->nama_lembaga ?? 'Admin' }}</p>
@@ -84,11 +90,17 @@
                         <div class="border border-red-200 rounded-lg p-4 bg-red-50">
                             <div class="flex items-start justify-between mb-4">
                                 <div class="flex items-center">
-                                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-                                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                                        </svg>
-                                    </div>
+                                    @if($item->barang->foto_1)
+                                        <img src="data:image/jpeg;base64,{{ base64_encode($item->barang->foto_1) }}" 
+                                             alt="{{ $item->barang->nama_barang }}"
+                                             class="w-10 h-10 object-cover rounded-lg mr-3">
+                                    @else
+                                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                                            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                            </svg>
+                                        </div>
+                                    @endif
                                     <div>
                                         <h3 class="font-medium text-gray-900">{{ $item->barang->nama_barang }}</h3>
                                         <p class="text-sm text-gray-600">{{ $item->barang->admin->nama_lembaga ?? 'Admin' }} • {{ $item->jumlah_pinjam }} unit</p>

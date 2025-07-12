@@ -218,7 +218,14 @@ class TransaksiController extends Controller
 
             DB::commit();
 
-            return back()->with('success', $successMessage);
+            // Determine redirect based on transaction type
+            if ($transaksi->jenis_transaksi === 'denda') {
+                // For penalty payments, redirect to pengembalian index
+                return redirect()->route('superadmin.pengembalian.index')->with('success', $successMessage);
+            } else {
+                // For regular payments, go back to previous page (transaksi)
+                return back()->with('success', $successMessage);
+            }
 
         } catch (\Exception $e) {
             DB::rollBack();

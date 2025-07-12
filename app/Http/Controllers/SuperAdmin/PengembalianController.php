@@ -677,7 +677,17 @@ class PengembalianController extends Controller
         ->where('status_pembayaran_denda', 'uploaded')
         ->findOrFail($id);
         
-        return view('superadmin.pengembalian.penalty-verification', compact('pengembalian'));
+        // Find the related penalty payment transaction
+        $transaksi = \App\Models\Transaksi::where('id_pengembalian', $pengembalian->id_pengembalian)
+            ->where('jenis_transaksi', 'denda')
+            ->where('status_verifikasi', 'pending')
+            ->first();
+        
+        if (!$transaksi) {
+            return back()->with('error', 'Transaksi pembayaran denda tidak ditemukan atau sudah diproses.');
+        }
+        
+        return view('superadmin.pengembalian.penalty-verification', compact('pengembalian', 'transaksi'));
     }
 
     /**

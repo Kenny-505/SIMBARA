@@ -150,49 +150,34 @@
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Verifikasi Pembayaran</h2>
                 
-                <form action="{{ route('superadmin.pengembalian.verify-penalty-payment', $pengembalian->id_pengembalian) }}" method="POST" id="verificationForm">
-                    @csrf
-                    
-                    <!-- Notes -->
-                    <div class="mb-6">
-                        <label for="catatan_verifikasi" class="block text-sm font-medium text-gray-700 mb-2">
-                            Catatan Verifikasi (Opsional)
-                        </label>
-                        <textarea id="catatan_verifikasi" 
-                                 name="catatan_verifikasi" 
-                                 rows="4" 
-                                 placeholder="Contoh: Pembayaran sesuai dengan nominal yang diminta. Transfer diterima dengan baik."
-                                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
-                        @error('catatan_verifikasi')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Approve Button -->
-                        <button type="button" 
-                                onclick="submitVerification('approve')"
-                                class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Approve Button -->
+                    <form action="{{ route('superadmin.transaksi.verify', $transaksi->id_transaksi) }}" method="POST" id="approveForm" class="inline">
+                        @csrf
+                        <button type="submit" 
+                                onclick="return confirm('Apakah Anda yakin ingin menyetujui pembayaran ini?\n\nSetelah disetujui:\n- Pengembalian akan ditandai selesai\n- Stok barang akan dikembalikan ke inventaris\n- User akan mendapat notifikasi approval')"
+                                class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Setujui Pembayaran
                         </button>
+                    </form>
 
-                        <!-- Reject Button -->
-                        <button type="button" 
-                                onclick="submitVerification('reject')"
-                                class="inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    <!-- Reject Button -->
+                    <form action="{{ route('superadmin.transaksi.reject', $transaksi->id_transaksi) }}" method="POST" id="rejectForm" class="inline">
+                        @csrf
+                        <button type="submit" 
+                                onclick="return confirm('Apakah Anda yakin ingin menolak pembayaran ini?\n\nSetelah ditolak:\n- User akan diminta upload ulang bukti pembayaran\n- Stok barang tetap tidak dikembalikan\n- User akan mendapat notifikasi penolakan')"
+                                class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
                             Tolak Pembayaran
                         </button>
-                    </div>
-
-                    <input type="hidden" name="action" id="action" value="">
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -222,21 +207,8 @@ function closeImageModal() {
     document.getElementById('imageModal').classList.add('hidden');
 }
 
-function submitVerification(action) {
-    const actionText = action === 'approve' ? 'menyetujui' : 'menolak';
-    const confirmText = `Apakah Anda yakin ingin ${actionText} pembayaran denda ini?`;
-    
-    if (action === 'approve') {
-        confirmText += '\n\nSetelah disetujui:\n- Pengembalian akan ditandai selesai\n- Stok barang akan dikembalikan ke inventaris\n- User akan mendapat notifikasi approval';
-    } else {
-        confirmText += '\n\nSetelah ditolak:\n- User akan diminta upload ulang bukti pembayaran\n- Stok barang tetap tidak dikembalikan\n- User akan mendapat notifikasi penolakan';
-    }
-    
-    if (confirm(confirmText)) {
-        document.getElementById('action').value = action;
-        document.getElementById('verificationForm').submit();
-    }
-}
+// JavaScript functions are no longer needed as we're using direct form submissions
+// The confirmation dialogs are now handled inline in the onclick attributes
 
 // Close modal when clicking outside
 document.getElementById('imageModal').addEventListener('click', function(e) {

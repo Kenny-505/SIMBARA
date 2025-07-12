@@ -28,6 +28,31 @@
     @endif
 </div>
 
+<!-- Important Information Alert -->
+<div class="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-6">
+    <div class="flex items-start">
+        <div class="flex-shrink-0">
+            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+        </div>
+        <div class="ml-3">
+            <h3 class="text-lg font-semibold text-orange-800">Informasi Penting - Jam Operasional</h3>
+            <div class="mt-2 text-sm text-orange-700">
+                <p class="font-medium">Pengambilan dan pengembalian barang secara langsung hanya dapat dilakukan pada:</p>
+                <ul class="list-disc list-inside mt-2 space-y-1">
+                    <li><strong>Waktu:</strong> Jam 08:00 - 18:00 WIB</li>
+                    <li><strong>Hari:</strong> Setiap hari (termasuk Sabtu dan Minggu)</li>
+                    <li><strong>Tempat:</strong> Sekretariat FMIPA</li>
+                </ul>
+                <p class="mt-2 text-xs text-orange-600">
+                    <strong>Catatan:</strong> Pastikan untuk mengambil/mengembalikan barang sesuai jadwal yang telah ditentukan dan dalam jam operasional yang berlaku.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
 @if($peminjaman->status_pengajuan === 'partial')
     <!-- PARTIAL MODE: Edit only rejected items -->
     <form action="{{ route('user.pengajuan.update', $peminjaman->id_peminjaman) }}" method="POST" id="partialForm">

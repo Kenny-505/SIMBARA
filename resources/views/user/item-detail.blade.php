@@ -122,18 +122,6 @@
 
         <!-- Action Buttons -->
         <div class="space-y-3">
-            @if($barang->stok_tersedia > 0)
-                <a href="{{ route('user.pengajuan.form', ['item_id' => $barang->id_barang]) }}" 
-                   class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-lg font-medium text-center block">
-                    Ajukan Peminjaman
-                </a>
-            @else
-                <button disabled 
-                        class="w-full bg-gray-300 text-gray-500 py-3 px-6 rounded-lg cursor-not-allowed text-lg font-medium">
-                    Stok Tidak Tersedia
-                </button>
-            @endif
-            
             <a href="{{ route('user.gallery') }}" 
                class="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors text-lg font-medium text-center block">
                 Kembali ke Katalog

@@ -217,11 +217,19 @@
                     @elseif($peminjaman->pengembalian->status_pengembalian === 'completed')
                         <span class="text-sm text-green-600">Pengembalian Selesai</span>
                     @elseif($peminjaman->pengembalian->status_pengembalian === 'payment_required')
+                        @if($peminjaman->pengembalian->status_pembayaran_denda === 'rejected')
+                        <a href="{{ route('user.pengembalian.penalty-payment', $peminjaman->pengembalian->id_pengembalian) }}" 
+                           class="bg-red-700 text-white px-4 py-2 rounded-lg hover:bg-red-800 transition-colors text-sm">
+                            Upload Ulang Bukti
+                        </a>
+                        <span class="text-sm text-red-700">Pembayaran Ditolak - Perlu Upload Ulang</span>
+                        @else
                         <a href="{{ route('user.pengembalian.penalty-payment', $peminjaman->pengembalian->id_pengembalian) }}" 
                            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
                             Bayar Denda
                         </a>
                         <span class="text-sm text-red-600">Denda Perlu Dibayar</span>
+                        @endif
                     @else
                         <span class="text-sm text-orange-600">{{ ucfirst(str_replace('_', ' ', $peminjaman->pengembalian->status_pengembalian)) }}</span>
                     @endif

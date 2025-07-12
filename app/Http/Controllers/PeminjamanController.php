@@ -273,6 +273,13 @@ class PeminjamanController extends Controller
      */
     public function confirmPeminjaman($id)
     {
+        \Log::info('confirmPeminjaman method called', [
+            'id' => $id,
+            'user_id' => Auth::guard('user')->id(),
+            'request_method' => request()->method(),
+            'url' => request()->url()
+        ]);
+        
         try {
             $user = Auth::guard('user')->user();
             
@@ -282,17 +289,44 @@ class PeminjamanController extends Controller
                 ->where('status_pengajuan', 'approved')
                 ->firstOrFail();
 
+            \Log::info('Peminjaman found for confirmation', [
+                'peminjaman_id' => $peminjaman->id_peminjaman,
+                'status_pengajuan' => $peminjaman->status_pengajuan,
+                'user_id' => $peminjaman->id_user
+            ]);
+
             // Check if all active items (not deleted by user) are approved
             $activeItems = $peminjaman->peminjamanBarangs->whereNull('user_action');
             $allApproved = $activeItems->every(function($item) {
                 return $item->status_persetujuan === 'approved';
             });
 
+            \Log::info('Items approval check', [
+                'total_active_items' => $activeItems->count(),
+                'all_approved' => $allApproved,
+                'items_status' => $activeItems->pluck('status_persetujuan')->toArray(),
+                'items_detail' => $activeItems->map(function($item) {
+                    return [
+                        'id' => $item->id_peminjaman_barang,
+                        'nama_barang' => $item->barang->nama_barang ?? 'Unknown',
+                        'status_persetujuan' => $item->status_persetujuan,
+                        'user_action' => $item->user_action
+                    ];
+                })->toArray()
+            ]);
+
             if (!$allApproved) {
+                \Log::warning('Not all items approved');
                 return back()->with('error', 'Tidak semua barang telah disetujui admin.');
             }
 
             $isNonCivitas = $user->role->nama_role === 'user_non_fmipa';
+
+            \Log::info('User type check', [
+                'user_role' => $user->role->nama_role,
+                'is_non_civitas' => $isNonCivitas,
+                'total_biaya' => $peminjaman->total_biaya
+            ]);
 
             if ($isNonCivitas && $peminjaman->total_biaya > 0) {
                 // Non-civitas needs to upload payment proof after confirmation
@@ -301,11 +335,17 @@ class PeminjamanController extends Controller
                     'status_pembayaran' => 'pending'
                 ]);
 
+                \Log::info('Non-civitas confirmation completed, redirecting to payment');
+
                 return redirect()->route('user.peminjaman.payment', $id)
                     ->with('info', 'Peminjaman berhasil dikonfirmasi. Silakan upload bukti pembayaran untuk melanjutkan proses.');
             } else {
                 // Civitas can proceed directly (or non-civitas with no cost)
+                \Log::info('Processing confirmed loan for civitas');
+                
                 $this->processConfirmedLoan($peminjaman);
+                
+                \Log::info('Civitas confirmation completed successfully');
                 
                 return redirect()->route('user.peminjaman.index')
                     ->with('success', 'Peminjaman berhasil dikonfirmasi. Silakan ambil barang sesuai jadwal.');

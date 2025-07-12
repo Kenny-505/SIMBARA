@@ -7,8 +7,11 @@ use App\Models\Barang;
 use App\Models\Admin;
 use App\Models\Peminjaman;
 use App\Models\PeminjamanBarang;
+use App\Models\Pengembalian;
+use App\Models\PengembalianBarang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class InventarisController extends Controller
 {
@@ -271,5 +274,261 @@ class InventarisController extends Controller
             ->get();
         
         return response()->json($data);
+    }
+    
+    /**
+     * Audit stok barang untuk menemukan inconsistency
+     */
+    public function auditStock(Request $request)
+    {
+        $results = [];
+        $issues = [];
+        
+        // Get all active items
+        $barangs = Barang::where('is_active', true)->get();
+        
+        foreach ($barangs as $barang) {
+            $audit = $this->auditSingleItem($barang);
+            $results[] = $audit;
+            
+            if (!$audit['is_consistent']) {
+                $issues[] = $audit;
+            }
+        }
+        
+        if ($request->ajax()) {
+            return response()->json([
+                'total_items' => count($results),
+                'issues_found' => count($issues),
+                'results' => $results,
+                'issues' => $issues
+            ]);
+        }
+        
+        return view('superadmin.inventaris.audit', compact('results', 'issues'));
+    }
+    
+    /**
+     * Audit single item stock consistency
+     */
+    private function auditSingleItem(Barang $barang)
+    {
+        $result = [
+            'id_barang' => $barang->id_barang,
+            'nama_barang' => $barang->nama_barang,
+            'current_stock_total' => $barang->stok_total,
+            'current_stock_available' => $barang->stok_tersedia,
+            'calculated_stock_total' => $barang->stok_total, // Start with current
+            'calculated_stock_available' => 0,
+            'stock_borrowed' => 0,
+            'stock_returned' => 0,
+            'stock_damaged_lost' => 0,
+            'is_consistent' => true,
+            'issues' => [],
+            'peminjaman_data' => [],
+            'pengembalian_data' => []
+        ];
+        
+        // Calculate stock based on peminjaman and pengembalian
+        $calculated = $this->calculateExpectedStock($barang);
+        
+        $result['calculated_stock_available'] = $calculated['expected_available'];
+        $result['stock_borrowed'] = $calculated['total_borrowed'];
+        $result['stock_returned'] = $calculated['total_returned'];
+        $result['stock_damaged_lost'] = $calculated['total_damaged'];
+        $result['peminjaman_data'] = $calculated['peminjaman_breakdown'];
+        $result['pengembalian_data'] = $calculated['pengembalian_breakdown'];
+        
+        // Check for inconsistencies
+        if ($barang->stok_tersedia != $calculated['expected_available']) {
+            $result['is_consistent'] = false;
+            $result['issues'][] = "Stok tersedia tidak sesuai. Database: {$barang->stok_tersedia}, Calculated: {$calculated['expected_available']}";
+        }
+        
+        if ($barang->stok_tersedia > $barang->stok_total) {
+            $result['is_consistent'] = false;
+            $result['issues'][] = "Stok tersedia lebih besar dari stok total";
+        }
+        
+        if ($barang->stok_tersedia < 0) {
+            $result['is_consistent'] = false;
+            $result['issues'][] = "Stok tersedia negatif";
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Calculate expected stock based on loan and return history
+     */
+    private function calculateExpectedStock(Barang $barang)
+    {
+        $initialStock = $barang->stok_total;
+        
+        // Get all approved peminjaman for this item
+        $peminjamanBarangs = PeminjamanBarang::where('id_barang', $barang->id_barang)
+            ->where('status_persetujuan', 'approved')
+            ->whereHas('peminjaman', function($q) {
+                $q->whereIn('status_peminjaman', ['ongoing', 'returned']);
+            })
+            ->with('peminjaman')
+            ->get();
+        
+        $totalBorrowed = $peminjamanBarangs->sum('jumlah_pinjam');
+        
+        // Get all completed returns for this item
+        $pengembalianBarangs = PengembalianBarang::where('id_barang', $barang->id_barang)
+            ->whereHas('pengembalian', function($q) {
+                $q->whereIn('status_pengembalian', ['completed', 'fully_completed']);
+            })
+            ->with('pengembalian')
+            ->get();
+        
+        $totalReturned = 0;
+        $totalDamaged = 0;
+        
+        foreach ($pengembalianBarangs as $item) {
+            if ($item->kondisi_barang === 'parah') {
+                $totalDamaged += $item->jumlah_kembali;
+            } else {
+                $totalReturned += $item->jumlah_kembali;
+            }
+        }
+        
+        // Expected available stock = initial - borrowed + returned
+        // Total stock should be reduced by damaged items
+        $expectedAvailable = $initialStock - $totalBorrowed + $totalReturned;
+        $expectedTotal = $initialStock - $totalDamaged;
+        
+        return [
+            'expected_available' => max(0, $expectedAvailable),
+            'expected_total' => max(0, $expectedTotal),
+            'total_borrowed' => $totalBorrowed,
+            'total_returned' => $totalReturned,
+            'total_damaged' => $totalDamaged,
+            'peminjaman_breakdown' => $peminjamanBarangs->map(function($item) {
+                return [
+                    'kode_peminjaman' => $item->peminjaman->kode_peminjaman,
+                    'jumlah' => $item->jumlah_pinjam,
+                    'status' => $item->peminjaman->status_peminjaman,
+                    'tanggal' => $item->created_at->format('Y-m-d')
+                ];
+            }),
+            'pengembalian_breakdown' => $pengembalianBarangs->map(function($item) {
+                return [
+                    'kode_peminjaman' => $item->pengembalian->peminjaman->kode_peminjaman,
+                    'jumlah' => $item->jumlah_kembali,
+                    'kondisi' => $item->kondisi_barang,
+                    'status' => $item->pengembalian->status_pengembalian,
+                    'tanggal' => $item->created_at->format('Y-m-d')
+                ];
+            })
+        ];
+    }
+    
+    /**
+     * Fix stock inconsistencies
+     */
+    public function fixStock(Request $request)
+    {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.id_barang' => 'required|exists:barang,id_barang',
+            'items.*.action' => 'required|in:recalculate,manual_adjust',
+            'items.*.new_available' => 'nullable|integer|min:0',
+            'items.*.new_total' => 'nullable|integer|min:0'
+        ]);
+        
+        $fixed = [];
+        $errors = [];
+        
+        DB::beginTransaction();
+        try {
+            foreach ($request->items as $itemData) {
+                $barang = Barang::findOrFail($itemData['id_barang']);
+                $oldAvailable = $barang->stok_tersedia;
+                $oldTotal = $barang->stok_total;
+                
+                if ($itemData['action'] === 'recalculate') {
+                    // Recalculate based on transaction history
+                    $calculated = $this->calculateExpectedStock($barang);
+                    
+                    $barang->update([
+                        'stok_tersedia' => max(0, $calculated['expected_available']),
+                        'stok_total' => max(0, $calculated['expected_total'])
+                    ]);
+                    
+                    $fixed[] = [
+                        'nama_barang' => $barang->nama_barang,
+                        'action' => 'recalculate',
+                        'old_available' => $oldAvailable,
+                        'new_available' => $barang->stok_tersedia,
+                        'old_total' => $oldTotal,
+                        'new_total' => $barang->stok_total
+                    ];
+                    
+                } elseif ($itemData['action'] === 'manual_adjust') {
+                    // Manual adjustment
+                    $newAvailable = $itemData['new_available'];
+                    $newTotal = $itemData['new_total'] ?? $barang->stok_total;
+                    
+                    if ($newAvailable > $newTotal) {
+                        $errors[] = "Stok tersedia tidak boleh lebih besar dari stok total untuk {$barang->nama_barang}";
+                        continue;
+                    }
+                    
+                    $barang->update([
+                        'stok_tersedia' => $newAvailable,
+                        'stok_total' => $newTotal
+                    ]);
+                    
+                    $fixed[] = [
+                        'nama_barang' => $barang->nama_barang,
+                        'action' => 'manual_adjust',
+                        'old_available' => $oldAvailable,
+                        'new_available' => $newAvailable,
+                        'old_total' => $oldTotal,
+                        'new_total' => $newTotal
+                    ];
+                }
+            }
+            
+            if (empty($errors)) {
+                DB::commit();
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Stok berhasil diperbaiki',
+                    'fixed_items' => $fixed
+                ]);
+            } else {
+                DB::rollback();
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ada error dalam perbaikan stok',
+                    'errors' => $errors
+                ], 400);
+            }
+            
+        } catch (\Exception $e) {
+            DB::rollback();
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Get detailed stock analysis for a specific item
+     */
+    public function getStockAnalysis($id)
+    {
+        $barang = Barang::findOrFail($id);
+        $audit = $this->auditSingleItem($barang);
+        
+        return response()->json($audit);
     }
 }

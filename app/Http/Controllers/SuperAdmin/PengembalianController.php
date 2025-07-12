@@ -739,6 +739,15 @@ class PengembalianController extends Controller
     }
     
     /**
+     * Public wrapper for updateStockAfterReturn method
+     * Called from TransaksiController when verifying penalty payments
+     */
+    public function updateStockAfterReturnPublic(Pengembalian $pengembalian)
+    {
+        return $this->updateStockAfterReturn($pengembalian);
+    }
+    
+    /**
      * Updates stock based on the condition of returned items.
      * Severely damaged items ('parah') are removed from total stock.
      * Other items are returned to available stock.

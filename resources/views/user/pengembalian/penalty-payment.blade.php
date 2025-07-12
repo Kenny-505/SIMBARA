@@ -84,9 +84,37 @@
     </div>
 
     @if($pengembalian->status_pengembalian === 'payment_required')
+    
+    <!-- Rejection Alert (if payment was rejected) -->
+    @if($pengembalian->status_pembayaran_denda === 'rejected')
+    <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+        <div class="flex items-center">
+            <svg class="w-6 h-6 text-red-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div class="flex-1">
+                <h3 class="text-lg font-semibold text-red-800">Bukti Pembayaran Sebelumnya Ditolak</h3>
+                <p class="text-red-700 mt-1">Bukti pembayaran yang Anda upload sebelumnya ditolak oleh Super Admin. Silakan upload ulang bukti pembayaran yang lebih jelas dan sesuai.</p>
+                @if($pengembalian->catatan_pembayaran)
+                <div class="mt-3 p-3 bg-red-100 rounded-lg">
+                    <p class="text-red-800 text-sm"><strong>Catatan Admin:</strong> {{ $pengembalian->catatan_pembayaran }}</p>
+                </div>
+                @endif
+                @if($pengembalian->verified_payment_at)
+                <p class="text-red-600 text-sm mt-2">
+                    <strong>Ditolak pada:</strong> {{ $pengembalian->verified_payment_at->format('d/m/Y H:i') }}
+                </p>
+                @endif
+            </div>
+        </div>
+    </div>
+    @endif
+    
     <!-- Upload Form -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload Bukti Transfer Denda</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            {{ $pengembalian->status_pembayaran_denda === 'rejected' ? 'Upload Ulang Bukti Transfer Denda' : 'Upload Bukti Transfer Denda' }}
+        </h2>
         
         @if($errors->any())
             <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">

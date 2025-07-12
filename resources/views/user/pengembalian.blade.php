@@ -127,7 +127,7 @@
                     <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                         Perlu Bayar Denda
                     </span>
-                @elseif($pengembalian->status_pengembalian === 'payment_uploaded')
+                
                     @if($pengembalian->status_pembayaran_denda === 'uploaded')
                         <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                             Menunggu Verifikasi Pembayaran
@@ -137,8 +137,11 @@
                             Pembayaran Diverifikasi
                         </span>
                     @elseif($pengembalian->status_pembayaran_denda === 'rejected')
-                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            Pembayaran Ditolak
+                        <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-200 text-red-900 border border-red-300">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Pembayaran Ditolak - Perlu Upload Ulang
                         </span>
                     @else
                         <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
@@ -181,11 +184,15 @@
                         </a>
                         @if($pengembalian->status_pengembalian === 'payment_required')
                         <a href="{{ route('user.pengembalian.penalty-payment', $pengembalian->id_pengembalian) }}" 
-                           class="inline-flex items-center px-3 py-2 bg-red-600 text-sm font-medium rounded-md text-white hover:bg-red-700">
+                           class="inline-flex items-center px-3 py-2 {{ $pengembalian->status_pembayaran_denda === 'rejected' ? 'bg-red-700 hover:bg-red-800' : 'bg-red-600 hover:bg-red-700' }} text-sm font-medium rounded-md text-white">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                @if($pengembalian->status_pembayaran_denda === 'rejected')
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                @else
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                @endif
                             </svg>
-                            Bayar Denda
+                            {{ $pengembalian->status_pembayaran_denda === 'rejected' ? 'Upload Ulang Bukti' : 'Bayar Denda' }}
                         </a>
                         @elseif($pengembalian->status_pengembalian === 'pending')
                         <form action="{{ route('user.pengembalian.cancel', $pengembalian->id_pengembalian) }}" method="POST" class="inline">

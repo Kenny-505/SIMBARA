@@ -166,14 +166,14 @@ class PeminjamanController extends Controller
                         "Item {$item->barang->nama_barang} sudah diproses sebelumnya.");
                 }
                 
-                // Check stock availability
+                // Check stock availability (but don't deduct yet)
                 if ($item->barang->stok_tersedia < $item->jumlah_pinjam) {
                     return back()->with('error', 
                         "Stok {$item->barang->nama_barang} tidak mencukupi. 
                         Tersedia: {$item->barang->stok_tersedia}, Diminta: {$item->jumlah_pinjam}");
                 }
                 
-                // Update item approval
+                // Update item approval (DO NOT REDUCE STOCK YET)
                 $item->update([
                     'status_persetujuan' => 'approved',
                     'approved_by' => $admin->id_admin,
@@ -181,8 +181,7 @@ class PeminjamanController extends Controller
                     'tanggal_persetujuan' => now()
                 ]);
                 
-                // Reduce stock
-                $item->barang->decrement('stok_tersedia', $item->jumlah_pinjam);
+                // NOTE: Stock will be reduced when user confirms (civitas) or payment is verified (non-civitas)
                 
                 $approvedItems[] = $item->barang->nama_barang;
             }
@@ -299,7 +298,7 @@ class PeminjamanController extends Controller
             $approvedItems = [];
             
             foreach ($adminItems as $item) {
-                // Check stock availability
+                // Check stock availability (but don't deduct yet)
                 if ($item->barang->stok_tersedia < $item->jumlah_pinjam) {
                     return back()->with('error', 
                         "Stok {$item->barang->nama_barang} tidak mencukupi. 
@@ -313,8 +312,7 @@ class PeminjamanController extends Controller
                     'tanggal_persetujuan' => now()
                 ]);
                 
-                // Reduce stock
-                $item->barang->decrement('stok_tersedia', $item->jumlah_pinjam);
+                // NOTE: Stock will be reduced when user confirms (civitas) or payment is verified (non-civitas)
                 
                 $approvedItems[] = $item->barang->nama_barang;
             }

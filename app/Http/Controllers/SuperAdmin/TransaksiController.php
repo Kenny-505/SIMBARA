@@ -157,16 +157,44 @@ class TransaksiController extends Controller
                     $pengembalian = $transaksi->pengembalian;
                     $peminjaman = $pengembalian->peminjaman;
                     
-                    // Update pengembalian status to completed
-                    $pengembalian->update(['status_pengembalian' => 'completed']);
+                    // Update pengembalian status to fully_completed
+                    $pengembalian->update([
+                        'status_pengembalian' => 'fully_completed',
+                        'status_pembayaran_denda' => 'verified'
+                    ]);
                     
                     // Update peminjaman status to returned
                     $peminjaman->update(['status_peminjaman' => 'returned']);
                     
-                    // Return stock to inventory
-                    foreach ($pengembalian->pengembalianBarangs as $item) {
-                        $item->barang->increment('stok_tersedia', $item->jumlah_kembali);
-                    }
+                    // Return stock using proper logic that considers item condition
+                    // Call the method from PengembalianController to maintain consistency
+                    $pengembalianController = app(\App\Http\Controllers\SuperAdmin\PengembalianController::class);
+                    $pengembalianController->updateStockAfterReturnPublic($pengembalian);
+                }
+            } elseif ($status === 'rejected') {
+                // Handle rejection based on transaction type
+                if ($transaksi->jenis_transaksi === 'sewa') {
+                    // For sewa payments, update peminjaman status
+                    $peminjaman = $transaksi->peminjaman;
+                    $peminjaman->update([
+                        'status_pembayaran' => 'rejected'
+                    ]);
+                } else {
+                    // Handle denda payment rejection - reset pengembalian for re-upload
+                    $pengembalian = $transaksi->pengembalian;
+                    $admin = auth()->guard('admin')->user();
+                    
+                    $pengembalian->update([
+                        'status_pengembalian' => 'payment_required',
+                        'status_pembayaran_denda' => 'rejected',
+                        'verified_payment_by' => $admin->id_admin,
+                        'verified_payment_at' => now(),
+                        'catatan_pembayaran' => 'Pembayaran denda ditolak oleh Super Admin. Silakan upload ulang bukti pembayaran.',
+                        'bukti_pembayaran_denda' => null, // Clear previous proof
+                        'tanggal_upload_pembayaran' => null
+                    ]);
+                    
+                    $successMessage = "Pembayaran denda ditolak. User akan diminta untuk upload ulang bukti pembayaran.";
                 }
             }
 

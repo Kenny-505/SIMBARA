@@ -185,7 +185,10 @@ Route::prefix('superadmin')->name('superadmin.')->middleware('superadmin')->grou
     // Inventaris Routes
     Route::prefix('inventaris')->name('inventaris.')->group(function () {
         Route::get('/', [\App\Http\Controllers\SuperAdmin\InventarisController::class, 'index'])->name('index');
+        Route::get('/audit/stock', [\App\Http\Controllers\SuperAdmin\InventarisController::class, 'auditStock'])->name('audit');
+        Route::post('/fix/stock', [\App\Http\Controllers\SuperAdmin\InventarisController::class, 'fixStock'])->name('fix');
         Route::get('/{id}', [\App\Http\Controllers\SuperAdmin\InventarisController::class, 'show'])->name('show');
+        Route::get('/{id}/analysis', [\App\Http\Controllers\SuperAdmin\InventarisController::class, 'getStockAnalysis'])->name('analysis');
         Route::get('/export/csv', [\App\Http\Controllers\SuperAdmin\InventarisController::class, 'export'])->name('export');
         Route::get('/stats/ajax', [\App\Http\Controllers\SuperAdmin\InventarisController::class, 'getStats'])->name('stats');
         Route::get('/reports/utilization', [\App\Http\Controllers\SuperAdmin\InventarisController::class, 'getUtilizationReport'])->name('utilization');

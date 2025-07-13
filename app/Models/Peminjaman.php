@@ -54,6 +54,11 @@ class Peminjaman extends Model
         return $this->hasOne(Transaksi::class, 'id_peminjaman');
     }
 
+    public function transaksis()
+    {
+        return $this->hasMany(Transaksi::class, 'id_peminjaman');
+    }
+
     // Helper method to get all barang through peminjamanBarangs
     public function barang()
     {

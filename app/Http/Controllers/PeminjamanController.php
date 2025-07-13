@@ -20,7 +20,7 @@ class PeminjamanController extends Controller
     {
         $user = Auth::guard('user')->user();
         
-        $peminjamans = Peminjaman::with(['peminjamanBarangs.barang.admin', 'transaksi', 'pengembalian'])
+        $peminjamans = Peminjaman::with(['peminjamanBarangs.barang.admin', 'transaksis', 'pengembalian'])
             ->where('id_user', $user->id_user)
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -427,7 +427,7 @@ class PeminjamanController extends Controller
             ->where('id_peminjaman', $id)
             ->where('id_user', $user->id_user)
             ->where('status_pengajuan', 'confirmed')
-            ->whereIn('status_pembayaran', ['pending', 'waiting_verification'])
+            ->whereIn('status_pembayaran', ['pending', 'waiting_verification', 'rejected']) // tambahkan 'rejected'
             ->firstOrFail();
 
         if ($user->role->nama_role !== 'user_non_fmipa') {
@@ -451,11 +451,11 @@ class PeminjamanController extends Controller
                 ->with('error', 'Fitur ini hanya untuk user non-civitas');
         }
 
-        // Find peminjaman (allow both pending and waiting_verification for re-upload)
+        // Find peminjaman (allow both pending, waiting_verification, and rejected for re-upload)
         $peminjaman = Peminjaman::where('id_peminjaman', $id)
             ->where('id_user', $user->id_user)
             ->where('status_pengajuan', 'confirmed')
-            ->whereIn('status_pembayaran', ['pending', 'waiting_verification'])
+            ->whereIn('status_pembayaran', ['pending', 'waiting_verification', 'rejected']) // tambahkan 'rejected'
             ->firstOrFail();
 
         // Validate request
@@ -471,17 +471,7 @@ class PeminjamanController extends Controller
 
         DB::beginTransaction();
         try {
-            // Check if transaction already exists
-            $existingTransaction = \App\Models\Transaksi::where('id_peminjaman', $peminjaman->id_peminjaman)->first();
-            
-            if ($existingTransaction) {
-                // Allow re-upload if existing data is dummy from migration
-                if ($existingTransaction->bukti_pembayaran !== 'dummy_payment_proof') {
-                    return back()->with('error', 'Bukti pembayaran sudah pernah diupload untuk peminjaman ini.');
-                }
-            }
-
-            // Process image upload
+            // Selalu buat transaksi baru untuk setiap upload ulang bukti pembayaran
             $file = $request->file('bukti_pembayaran');
             $imageData = file_get_contents($file->getRealPath());
             
@@ -490,29 +480,18 @@ class PeminjamanController extends Controller
                 'status_pembayaran' => 'waiting_verification'
             ]);
 
-            if ($existingTransaction && $existingTransaction->bukti_pembayaran === 'dummy_payment_proof') {
-                // Update existing dummy transaction with real data
-                $existingTransaction->update([
-                    'bukti_pembayaran' => $imageData,
-                    'tanggal_pembayaran' => now(),
-                    'notes_admin' => $request->catatan_pembayaran,
-                    'updated_at' => now()
-                ]);
-            } else {
-                // Create new transaction record for superadmin verification
-                \App\Models\Transaksi::create([
-                    'id_user' => $user->id_user,
-                    'id_peminjaman' => $peminjaman->id_peminjaman,
-                    'jenis_transaksi' => 'sewa',
-                    'nominal' => $peminjaman->total_biaya,
-                    'tanggal_pembayaran' => now(),
-                    'bukti_pembayaran' => $imageData,
-                    'status_verifikasi' => 'pending',
-                    'notes_admin' => $request->catatan_pembayaran,
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
-            }
+            \App\Models\Transaksi::create([
+                'id_user' => $user->id_user,
+                'id_peminjaman' => $peminjaman->id_peminjaman,
+                'jenis_transaksi' => 'sewa',
+                'nominal' => $peminjaman->total_biaya,
+                'tanggal_pembayaran' => now(),
+                'bukti_pembayaran' => $imageData,
+                'status_verifikasi' => 'pending',
+                'notes_admin' => $request->catatan_pembayaran,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
 
             DB::commit();
 

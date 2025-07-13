@@ -192,11 +192,11 @@ class TransaksiController extends Controller
             } elseif ($status === 'rejected') {
                 // Handle rejection based on transaction type
                 if ($transaksi->jenis_transaksi === 'sewa') {
-                    // For sewa payments, update peminjaman status
-                    $peminjaman = $transaksi->peminjaman;
-                    $peminjaman->update([
-                        'status_pembayaran' => 'rejected'
+                    // Untuk sewa, hanya update status dan catatan, JANGAN hapus bukti pembayaran
+                    $transaksi->update([
+                        'notes_admin' => 'Pembayaran sewa ditolak oleh Super Admin. Silakan upload ulang bukti pembayaran.'
                     ]);
+                    $successMessage = "Pembayaran sewa ditolak. User akan diminta untuk upload ulang bukti pembayaran.";
                 } else {
                     // Handle denda payment rejection - reset pengembalian for re-upload
                     $pengembalian = $transaksi->pengembalian;

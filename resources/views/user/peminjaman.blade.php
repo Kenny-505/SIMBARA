@@ -264,34 +264,27 @@
                 @endif
 
             @elseif($peminjaman->status_pengajuan === 'confirmed')
-                @if(auth()->guard('user')->user()->role->nama_role === 'user_non_fmipa' && $peminjaman->status_pembayaran === 'pending')
-                    <!-- Non-civitas need to upload payment proof -->
-                    <a href="{{ route('user.peminjaman.payment', $peminjaman->id_peminjaman) }}" 
-                       class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors text-sm">
-                        Upload Bukti Bayar
-                    </a>
-                @elseif(auth()->guard('user')->user()->role->nama_role === 'user_non_fmipa' && $peminjaman->status_pembayaran === 'waiting_verification')
-                    <!-- Payment uploaded, waiting for verification -->
-                    @php
-                        // Check if payment proof is dummy data
-                        $transaksi = $peminjaman->transaksi;
-                        $isDummyData = $transaksi && $transaksi->bukti_pembayaran === 'dummy_payment_proof';
-                    @endphp
-                    
-                    @if($isDummyData)
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sm text-orange-600">Bukti pembayaran perlu diupload ulang</span>
+                @php
+                    $allTransaksi = $peminjaman->transaksis ?? [];
+                    $transaksiApproved = collect($allTransaksi)->first(fn($t) => $t->status_verifikasi === 'approved');
+                    $transaksiPending = collect($allTransaksi)->first(fn($t) => in_array($t->status_verifikasi, ['pending', 'waiting_verification']));
+                    $allRejected = count($allTransaksi) > 0 && collect($allTransaksi)->every(fn($t) => $t->status_verifikasi === 'rejected');
+                @endphp
+                @php
+                    $allTransaksi = $peminjaman->transaksis ?? [];
+                    $adaRejected = collect($allTransaksi)->contains(fn($t) => $t->status_verifikasi === 'rejected');
+                    $adaPendingOrApproved = collect($allTransaksi)->contains(fn($t) => in_array($t->status_verifikasi, ['pending', 'waiting_verification', 'approved']));
+                @endphp
+                @if(auth()->guard('user')->user()->role->nama_role === 'user_non_fmipa' && $peminjaman->status_pengajuan === 'confirmed')
+                    @if(!$adaPendingOrApproved && $adaRejected)
+                        <div class="flex flex-col space-y-2">
+                            <span class="text-sm text-red-600 font-semibold">Pembayaran Anda sebelumnya <b>ditolak</b>. Silakan upload ulang bukti pembayaran sewa.</span>
                             <a href="{{ route('user.peminjaman.payment', $peminjaman->id_peminjaman) }}" 
-                               class="bg-orange-600 text-white px-3 py-1 rounded text-xs hover:bg-orange-700 transition-colors">
-                                Upload Bukti Bayar
+                               class="w-auto bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm">
+                                Upload Ulang Bukti Pembayaran
                             </a>
                         </div>
-                    @else
-                        <span class="text-sm text-yellow-600">Bukti bayar telah diupload, menunggu verifikasi</span>
                     @endif
-                @else
-                    <!-- Civitas or payment verified -->
-                    <span class="text-sm text-green-600">Peminjaman dikonfirmasi, siap diambil</span>
                 @endif
 
             @elseif($peminjaman->status_pengajuan === 'partial')
